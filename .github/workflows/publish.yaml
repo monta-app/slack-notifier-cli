@@ -38,8 +38,8 @@ jobs:
           name: slack-notifier-cli
           path: slack-notifier-cli
   create-change-log:
-    needs: [ build, test ]
-    name: Create and publish change log
+    needs: build
+    name: Create and publish
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
