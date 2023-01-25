@@ -43,6 +43,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - name: Download a single artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: slack-notifier-cli
+      - name: Give artifact correct permissions
+        run: chmod +x ./slack-notifier-cli
       - name: Run changelog cli action
         uses: monta-app/changelog-cli-action@main
         with:
