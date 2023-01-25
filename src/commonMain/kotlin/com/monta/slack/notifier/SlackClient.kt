@@ -81,17 +81,20 @@ class SlackClient(
     }
 
     private suspend fun makeSlackRequest(url: String, message: Message): Response? {
+
         val response = client.post(url) {
             header("Authorization", "Bearer $slackToken")
             contentType(ContentType.Application.Json)
             setBody(message)
         }
 
+        val bodyString = response.bodyAsText()
+
         return if (response.status.value in 200..299) {
-            println("successfully posted message")
-            jsonInstance.decodeFromString(response.bodyAsText())
+            println("successfully posted message bodyString=$bodyString")
+            jsonInstance.decodeFromString(bodyString)
         } else {
-            println("failed to post message ${response.bodyAsText()}")
+            println("failed to post message $bodyString")
             null
         }
     }

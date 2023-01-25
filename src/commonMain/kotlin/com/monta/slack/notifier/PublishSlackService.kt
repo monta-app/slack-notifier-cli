@@ -47,13 +47,12 @@ class PublishSlackService(
         }
 
 
-        val slackMessageId = if (messageId == null) {
+        val slackMessageId = if (messageId.isNullOrBlank()) {
             slackClient.create(
                 title = title,
                 color = color,
                 message = message
             )
-
         } else {
             slackClient.update(
                 messageId = messageId,
