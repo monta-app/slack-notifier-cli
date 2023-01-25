@@ -1,0 +1,63 @@
+name: Build binary
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+          cache: 'gradle'
+      - uses: actions/cache@v3
+        with:
+          path: "/home/runner/.konan"
+          key: ${{ runner.os }}-${{ hashFiles('**/build.gradle.kts') }}
+      - name: Install dependencies
+        run: |
+          sudo apt-get install libcurl4-openssl-dev
+      - name: Build with Gradle
+        run: ./gradlew commonBinaries
+      - name: Move and apply correct permissions to binary
+        run: |
+          cp build/bin/common/releaseExecutable/slack-notifier-cli.kexe ./slack-notifier-cli
+          chmod +x ./slack-notifier-cli
+      - name: Upload executable
+        uses: actions/upload-artifact@v3
+        with:
+          name: slack-notifier-cli
+          path: slack-notifier-cli
+  create-change-log:
+    needs: [ build, test ]
+    name: Create and publish change log
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Run changelog cli action
+        uses: monta-app/changelog-cli-action@main
+        with:
+          service-name: "Slack Notifier Cli"
+          github-release: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          jira-app-name: "montaapp"
+          output: "slack"
+          slack-token: ${{ secrets.SLACK_APP_TOKEN }}
+          slack-channel: "#releases"
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: slack-notifier-cli
+          asset_name: slack-notifier-cli
+          tag: ${{ github.ref }}
+          overwrite: true
