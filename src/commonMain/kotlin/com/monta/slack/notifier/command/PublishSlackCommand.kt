@@ -1,33 +1,35 @@
-package com.monta.slack.notifier
+package com.monta.slack.notifier.command
 
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
+import com.monta.slack.notifier.model.JobStatus
+import com.monta.slack.notifier.model.JobType
+import com.monta.slack.notifier.service.PublishSlackService
+import com.monta.slack.notifier.util.JsonUtil
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.decodeFromString
 
 class PublishSlackCommand : CliktCommand() {
-    private val banner = """
- __    __   ______   __   __   ______  ______    
-/\ "-./  \ /\  __ \ /\ "-.\ \ /\__  _\/\  __ \   
-\ \ \-./\ \\ \ \/\ \\ \ \-.  \\/_/\ \/\ \  __ \  
- \ \_\ \ \_\\ \_____\\ \_\\"\_\  \ \_\ \ \_\ \_\ 
-  \/_/  \/_/ \/_____/ \/_/ \/_/   \/_/  \/_/\/_/              
-        """.trimIndent()
 
-    private val status: String by option(
-        help = "Name of the service",
-        envvar = "PUBLISH_SLACK_STATUS"
+    private val githubContext: String by option(
+        help = "Github Context",
+        envvar = "PUBLISH_SLACK_GITHUB_CONTEXT"
     ).required()
 
-    private val title: String by option(
-        help = "Name of the service",
-        envvar = "PUBLISH_SLACK_TITLE"
+    private val jobType: String by option(
+        help = "Job Type",
+        envvar = "PUBLISH_SLACK_JOB_TYPE"
+    ).required()
+
+    private val jobStatus: String by option(
+        help = "Job Status",
+        envvar = "PUBLISH_SLACK_JOB_STATUS"
     ).required()
 
     private val slackToken: String by option(
         help = "Slack token used for publishing",
-        envvar = "SLACK_TOKEN"
+        envvar = "SLACK_APP_TOKEN"
     ).required()
 
     private val slackChannelId: String by option(
@@ -46,9 +48,10 @@ class PublishSlackCommand : CliktCommand() {
                 slackToken = slackToken,
                 slackChannelId = slackChannelId
             ).publish(
-                messageId = slackMessageId,
-                status = status,
-                title = title
+                githubContext = JsonUtil.instance.decodeFromString(githubContext),
+                jobType = JobType.fromString(jobType),
+                jobStatus = JobStatus.fromString(jobStatus),
+                slackMessageId = slackMessageId,
             )
         }
     }

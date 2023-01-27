@@ -1,4 +1,4 @@
-package com.monta.slack.notifier
+package com.monta.slack.notifier.util
 
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.toKString
