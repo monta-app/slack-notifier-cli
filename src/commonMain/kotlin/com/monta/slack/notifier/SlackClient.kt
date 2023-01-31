@@ -1,8 +1,9 @@
 package com.monta.slack.notifier
 
-import com.monta.slack.notifier.model.GithubContext
 import com.monta.slack.notifier.model.JobStatus
 import com.monta.slack.notifier.model.JobType
+import com.monta.slack.notifier.model.Messageable
+import com.monta.slack.notifier.model.SlackMessage
 import com.monta.slack.notifier.util.JsonUtil
 import com.monta.slack.notifier.util.client
 import io.ktor.client.request.*
@@ -18,7 +19,7 @@ class SlackClient(
 ) {
 
     suspend fun create(
-        githubContext: GithubContext,
+        messageable: Messageable,
         jobType: JobType,
         jobStatus: JobStatus,
     ): String {
@@ -26,7 +27,7 @@ class SlackClient(
         val response = makeSlackRequest(
             url = "https://slack.com/api/chat.postMessage",
             message = generateMessage(
-                githubContext = githubContext,
+                messageable = messageable,
                 jobType = jobType,
                 jobStatus = jobStatus,
             )
@@ -37,7 +38,7 @@ class SlackClient(
 
     suspend fun update(
         messageId: String,
-        githubContext: GithubContext,
+        messageable: Messageable,
         jobType: JobType,
         jobStatus: JobStatus,
     ): String {
@@ -47,7 +48,7 @@ class SlackClient(
         val response = makeSlackRequest(
             url = "https://slack.com/api/chat.update",
             message = generateMessage(
-                githubContext = githubContext,
+                messageable = messageable,
                 jobType = jobType,
                 jobStatus = jobStatus,
                 messageId = messageId,
@@ -59,14 +60,14 @@ class SlackClient(
     }
 
     private fun generateMessage(
-        githubContext: GithubContext,
+        messageable: Messageable,
         jobType: JobType,
         jobStatus: JobStatus,
         messageId: String? = null,
-        previousAttachments: List<MessageAttachment>? = null,
-    ): Message {
+        previousAttachments: List<SlackMessage.Attachment>? = null,
+    ): SlackMessage {
 
-        val attachments = mutableMapOf<JobType, MessageAttachment>()
+        val attachments = mutableMapOf<JobType, SlackMessage.Attachment>()
 
         previousAttachments?.forEach { previousAttachment ->
             if (previousAttachment.jobType == null) {
@@ -75,10 +76,10 @@ class SlackClient(
             attachments[previousAttachment.jobType] = previousAttachment
         }
 
-        attachments[jobType] = MessageAttachment(
+        attachments[jobType] = SlackMessage.Attachment(
             color = jobStatus.color,
             fields = listOf(
-                MessageAttachment.Field(
+                SlackMessage.Attachment.Field(
                     title = jobType.label,
                     short = false,
                     value = jobStatus.message
@@ -86,47 +87,9 @@ class SlackClient(
             )
         )
 
-        val commitEvent = githubContext.event?.commits?.firstOrNull()
-
-        return Message(
-            channel = slackChannelId,
-            ts = messageId,
-            blocks = listOf(
-                SlackBlock(
-                    type = "header",
-                    text = Text(
-                        type = "plain_text",
-                        text = "${githubContext.workflow}",
-                    )
-                ),
-                SlackBlock(
-                    type = "divider"
-                ),
-                SlackBlock(
-                    type = "section",
-                    fields = listOf(
-                        Text(
-                            type = "mrkdwn",
-                            text = " \n*Branch:*\n${githubContext.refName}",
-                        ),
-                        Text(
-                            type = "mrkdwn",
-                            text = " \n*Comitter:*\n${commitEvent?.committer?.displayName}",
-                        ),
-                        Text(
-                            type = "mrkdwn",
-                            text = " \n*Message:*\n<${commitEvent?.url}|${commitEvent?.message}>",
-                        ),
-                        Text(
-                            type = "mrkdwn",
-                            text = " \n*SHA:*\n<${commitEvent?.url}|${commitEvent?.id}>",
-                        )
-                    )
-                ),
-                SlackBlock(
-                    type = "divider"
-                )
-            ),
+        return messageable.toMessage(
+            slackChannelId = slackChannelId,
+            messageId = messageId,
             attachments = attachments.values.toList()
         )
     }
@@ -157,7 +120,7 @@ class SlackClient(
         }
     }
 
-    private suspend fun makeSlackRequest(url: String, message: Message): Response? {
+    private suspend fun makeSlackRequest(url: String, message: SlackMessage): Response? {
 
         val response = client.post(url) {
             header("Authorization", "Bearer $slackToken")
@@ -177,94 +140,6 @@ class SlackClient(
     }
 
     @Serializable
-    private data class Message(
-        val channel: String? = null,
-        val ts: String? = null,
-        val text: String? = null,
-        val blocks: List<SlackBlock>? = null,
-        val attachments: List<MessageAttachment>? = null,
-    )
-
-    @Serializable
-    private class SlackBlock(
-        @SerialName("type")
-        val type: String,
-        @SerialName("text")
-        val text: Text? = null,
-        @SerialName("fields")
-        val fields: List<Text>? = null,
-    )
-
-    @Serializable
-    private class Text(
-        @SerialName("type")
-        val type: String,
-        @SerialName("text")
-        val text: String,
-        @SerialName("emoji")
-        val emoji: Boolean = true,
-        @SerialName("short")
-        val short: Boolean = true,
-    )
-
-    @Serializable
-    private data class MessageAttachment(
-        @SerialName("mrkdwn_in")
-        val mrkdwnIn: List<String> = listOf("text"),
-        @SerialName("color")
-        val color: String? = null,
-        @SerialName("pretext")
-        val pretext: String? = null,
-        @SerialName("author_name")
-        val authorName: String? = null,
-        @SerialName("author_link")
-        val authorLink: String? = null,
-        @SerialName("author_icon")
-        val authorIcon: String? = null,
-        @SerialName("title")
-        val title: String? = null,
-        @SerialName("title_link")
-        val titleLink: String? = null,
-        @SerialName("text")
-        val text: String? = null,
-        @SerialName("fields")
-        val fields: List<Field>? = null,
-        @SerialName("thumb_url")
-        val thumbUrl: String? = null,
-        @SerialName("footer")
-        val footer: String? = null,
-        @SerialName("footer_icon")
-        val footerIcon: String? = null,
-        @SerialName("blocks")
-        val blocks: List<SlackBlock>? = null,
-    ) {
-
-        val jobType = JobType.fromLabel(
-            label = fields?.firstOrNull()?.title
-        )
-
-        @Serializable
-        data class Field(
-            @SerialName("title")
-            val title: String, // A field's title
-            @SerialName("value")
-            val value: String, // This field's value
-            @SerialName("short")
-            val short: Boolean, // false
-        )
-
-        @Serializable
-        data class Action(
-            @SerialName("type")
-            val type: String, // A field's title
-            @SerialName("value")
-            val text: String, // This field's value
-            @SerialName("url")
-            val url: String, // false
-        )
-    }
-
-    @Serializable
     private data class Response(
         @SerialName("ok")
         val ok: Boolean, // true
@@ -279,6 +154,6 @@ class SlackClient(
         @SerialName("ok")
         val ok: Boolean, // true
         @SerialName("messages")
-        val messages: List<Message>,
+        val messages: List<SlackMessage>,
     )
 }

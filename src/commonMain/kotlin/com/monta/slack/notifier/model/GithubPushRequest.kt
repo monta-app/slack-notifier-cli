@@ -4,9 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class GithubContext(
-    @SerialName("token")
-    val token: String?, // ***
+data class GithubPushRequest(
     @SerialName("job")
     val job: String?, // printJob
     @SerialName("ref")
@@ -73,7 +71,7 @@ data class GithubContext(
     val workspace: String?, // /home/runner/work/service-ocpp/service-ocpp
     @SerialName("action")
     val action: String?, // __run
-) {
+) : Messageable {
     @Serializable
     data class Event(
         @SerialName("after")
@@ -123,8 +121,64 @@ data class GithubContext(
                 @SerialName("username")
                 val username: String?, // BrianEstrada
             ) {
-                val displayName: String = "$name<$email>"
+                val displayName: String? = when {
+                    email == null && name == null -> null
+                    email == null && name != null -> name
+                    email != null && name == null -> email
+                    else -> "$name<$email>"
+                }
             }
         }
+    }
+
+    override fun toMessage(
+        slackChannelId: String,
+        messageId: String?,
+        attachments: List<SlackMessage.Attachment>?,
+    ): SlackMessage {
+
+        val commitEvent = event?.commits?.firstOrNull()
+
+        return SlackMessage(
+            channel = slackChannelId,
+            ts = messageId,
+            blocks = listOf(
+                SlackBlock(
+                    type = "header",
+                    text = SlackBlock.Text(
+                        type = "plain_text",
+                        text = "$workflow",
+                    )
+                ),
+                SlackBlock(
+                    type = "divider"
+                ),
+                SlackBlock(
+                    type = "section",
+                    fields = listOf(
+                        SlackBlock.Text(
+                            type = "mrkdwn",
+                            text = " \n*Branch:*\n${refName}",
+                        ),
+                        SlackBlock.Text(
+                            type = "mrkdwn",
+                            text = " \n*Comitter:*\n${commitEvent?.committer?.displayName}",
+                        ),
+                        SlackBlock.Text(
+                            type = "mrkdwn",
+                            text = " \n*Message:*\n<${commitEvent?.url}|${commitEvent?.message}>",
+                        ),
+                        SlackBlock.Text(
+                            type = "mrkdwn",
+                            text = " \n*SHA:*\n<${commitEvent?.url}|${commitEvent?.id}>",
+                        )
+                    )
+                ),
+                SlackBlock(
+                    type = "divider"
+                )
+            ),
+            attachments = attachments
+        )
     }
 }

@@ -6,9 +6,7 @@ import com.github.ajalt.clikt.parameters.options.required
 import com.monta.slack.notifier.model.JobStatus
 import com.monta.slack.notifier.model.JobType
 import com.monta.slack.notifier.service.PublishSlackService
-import com.monta.slack.notifier.util.JsonUtil
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.decodeFromString
 
 class PublishSlackCommand : CliktCommand() {
 
@@ -48,7 +46,7 @@ class PublishSlackCommand : CliktCommand() {
                 slackToken = slackToken,
                 slackChannelId = slackChannelId
             ).publish(
-                githubContext = JsonUtil.instance.decodeFromString(githubContext),
+                githubContext = githubContext,
                 jobType = JobType.fromString(jobType),
                 jobStatus = JobStatus.fromString(jobStatus),
                 slackMessageId = slackMessageId,
