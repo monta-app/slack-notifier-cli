@@ -72,6 +72,9 @@ data class GithubPushRequest(
     @SerialName("action")
     val action: String?, // __run
 ) : Messageable {
+
+    private val repositoryName: String? = repository?.split("/")?.last()
+
     @Serializable
     data class Event(
         @SerialName("after")
@@ -147,7 +150,11 @@ data class GithubPushRequest(
                     type = "header",
                     text = SlackBlock.Text(
                         type = "plain_text",
-                        text = "$workflow",
+                        text = if (repositoryName != null) {
+                            "$repositoryName - $workflow"
+                        } else {
+                            "$workflow"
+                        }
                     )
                 ),
                 SlackBlock(

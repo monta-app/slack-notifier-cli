@@ -10,6 +10,8 @@ data class GithubPullRequest(
     val job: String?, // printJob
     @SerialName("sha")
     val sha: String?, // 0a2debbc56212c2513b58e244cc94e4774aed004
+    @SerialName("repository")
+    val repository: String?, // monta-app/service-ocppi
     @SerialName("triggering_actor")
     val triggeringActor: String?, // BrianEstrada
     @SerialName("workflow")
@@ -19,6 +21,9 @@ data class GithubPullRequest(
     @SerialName("event")
     val event: Event?,
 ) : Messageable {
+
+    private val repositoryName: String? = repository?.split("/")?.last()
+
     @Serializable
     data class Event(
         @SerialName("pull_request")
@@ -48,7 +53,11 @@ data class GithubPullRequest(
                     type = "header",
                     text = SlackBlock.Text(
                         type = "plain_text",
-                        text = "$workflow",
+                        text = if (repositoryName != null) {
+                            "$repositoryName - $workflow"
+                        } else {
+                            "$workflow"
+                        }
                     )
                 ),
                 SlackBlock(

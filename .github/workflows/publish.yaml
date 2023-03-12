@@ -56,6 +56,7 @@ jobs:
           github-release: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
           jira-app-name: "montaapp"
+          version-mode: "SemVer"
           output: "slack"
           slack-token: ${{ secrets.SLACK_APP_TOKEN }}
           slack-channel: "#releases"
