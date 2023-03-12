@@ -8,65 +8,65 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class GithubPushContext(
     @SerialName("ref")
-    val ref: String?, // refs/heads/develop
+    val ref: String? = null, // refs/heads/develop
     @SerialName("sha")
-    val sha: String?, // c545a1613f18937a88a13935c4d644e8f81b71d6
+    val sha: String? = null, // c545a1613f18937a88a13935c4d644e8f81b71d6
     @SerialName("repository")
-    val repository: String?, // monta-app/service-integrations
+    val repository: String? = null, // monta-app/service-integrations
     @SerialName("actor")
-    val actor: String?, // BrianEstrada
+    val actor: String? = null, // BrianEstrada
     @SerialName("triggering_actor")
-    val triggeringActor: String?, // BrianEstrada
+    val triggeringActor: String? = null, // BrianEstrada
     @SerialName("workflow")
-    val workflow: String?, // Deploy Dev
+    val workflow: String? = null, // Deploy Dev
     @SerialName("event_name")
-    val eventName: String?, // push
+    val eventName: String? = null, // push
     @SerialName("event")
-    val event: Event?,
+    val event: Event? = null,
     @SerialName("ref_name")
-    val refName: String?, // develop
+    val refName: String? = null, // develop
     @SerialName("ref_type")
-    val refType: String? // branch
+    val refType: String? = null // branch
 ) {
 
     @Serializable
     data class Event(
         @SerialName("head_commit")
-        val headCommit: Commit?,
+        val headCommit: Commit? = null,
         @SerialName("pusher")
-        val pusher: Committer?,
+        val pusher: Committer? = null,
         @SerialName("ref")
-        val ref: String? // refs/heads/develop
+        val ref: String? = null // refs/heads/develop
     )
 
     @Serializable
     data class Commit(
         @SerialName("author")
-        val author: Committer?,
+        val author: Committer? = null,
         @SerialName("committer")
-        val committer: Committer?,
+        val committer: Committer? = null,
         @SerialName("distinct")
-        val distinct: Boolean?, // true
+        val distinct: Boolean? = null, // true
         @SerialName("id")
-        val id: String?, // c545a1613f18937a88a13935c4d644e8f81b71d6
+        val id: String? = null, // c545a1613f18937a88a13935c4d644e8f81b71d6
         @SerialName("message")
-        val message: String?, // ignore: test
+        val message: String? = null, // ignore: test
         @SerialName("timestamp")
-        val timestamp: String?, // 2023-03-12T21:24:19+01:00
+        val timestamp: String? = null, // 2023-03-12T21:24:19+01:00
         @SerialName("tree_id")
-        val treeId: String?, // f3667a7332372de2ccb6a1cc5c310e780915a28e
+        val treeId: String? = null, // f3667a7332372de2ccb6a1cc5c310e780915a28e
         @SerialName("url")
-        val url: String? // https://github.com/monta-app/service-integrations/commit/c545a1613f18937a88a13935c4d644e8f81b71d6
+        val url: String? = null// https://github.com/monta-app/service-integrations/commit/c545a1613f18937a88a13935c4d644e8f81b71d6
     )
 
     @Serializable
     data class Committer(
         @SerialName("email")
-        val email: String?, // lovesguitar@gmail.com
+        val email: String? = null, // lovesguitar@gmail.com
         @SerialName("name")
-        val name: String?, // Brian Estrada
+        val name: String? = null, // Brian Estrada
         @SerialName("username")
-        val username: String? // BrianEstrada
+        val username: String? = null// BrianEstrada
     ) {
         val displayName: String? = when {
             email == null && name == null -> null
