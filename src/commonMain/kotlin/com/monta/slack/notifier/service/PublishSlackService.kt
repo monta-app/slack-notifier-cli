@@ -1,13 +1,12 @@
 package com.monta.slack.notifier.service
 
 import com.monta.slack.notifier.SlackClient
-import com.monta.slack.notifier.model.*
+import com.monta.slack.notifier.model.GithubPushContext
+import com.monta.slack.notifier.model.JobStatus
+import com.monta.slack.notifier.model.JobType
 import com.monta.slack.notifier.util.JsonUtil
 import com.monta.slack.notifier.util.writeToOutput
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.jsonPrimitive
 
 class PublishSlackService(
     serviceName: String?,
@@ -30,26 +29,18 @@ class PublishSlackService(
         slackMessageId: String?,
     ): String {
 
-        val jsonObject = JsonUtil.instance.decodeFromString<JsonObject>(githubContext)
-
-        val eventName = jsonObject["event_name"]?.jsonPrimitive?.contentOrNull
-
-        val messageable: Messageable = if (eventName == "pull_request") {
-            JsonUtil.instance.decodeFromString<GithubPullRequest>(githubContext)
-        } else {
-            JsonUtil.instance.decodeFromString<GithubPushRequest>(githubContext)
-        }
+        val githubPushContext = JsonUtil.instance.decodeFromString<GithubPushContext>(githubContext)
 
         val messageId = if (slackMessageId.isNullOrBlank()) {
             slackClient.create(
-                messageable = messageable,
+                githubPushContext = githubPushContext,
                 jobType = jobType,
                 jobStatus = jobStatus,
             )
         } else {
             slackClient.update(
                 messageId = slackMessageId,
-                messageable = messageable,
+                githubPushContext = githubPushContext,
                 jobType = jobType,
                 jobStatus = jobStatus,
             )

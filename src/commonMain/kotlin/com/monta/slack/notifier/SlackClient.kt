@@ -1,9 +1,6 @@
 package com.monta.slack.notifier
 
-import com.monta.slack.notifier.model.JobStatus
-import com.monta.slack.notifier.model.JobType
-import com.monta.slack.notifier.model.Messageable
-import com.monta.slack.notifier.model.SlackMessage
+import com.monta.slack.notifier.model.*
 import com.monta.slack.notifier.util.JsonUtil
 import com.monta.slack.notifier.util.client
 import io.ktor.client.request.*
@@ -21,7 +18,7 @@ class SlackClient(
 ) {
 
     suspend fun create(
-        messageable: Messageable,
+        githubPushContext: GithubPushContext,
         jobType: JobType,
         jobStatus: JobStatus,
     ): String {
@@ -29,7 +26,7 @@ class SlackClient(
         val response = makeSlackRequest(
             url = "https://slack.com/api/chat.postMessage",
             message = generateMessage(
-                messageable = messageable,
+                githubPushContext = githubPushContext,
                 jobType = jobType,
                 jobStatus = jobStatus,
             )
@@ -40,7 +37,7 @@ class SlackClient(
 
     suspend fun update(
         messageId: String,
-        messageable: Messageable,
+        githubPushContext: GithubPushContext,
         jobType: JobType,
         jobStatus: JobStatus,
     ): String {
@@ -50,7 +47,7 @@ class SlackClient(
         val response = makeSlackRequest(
             url = "https://slack.com/api/chat.update",
             message = generateMessage(
-                messageable = messageable,
+                githubPushContext = githubPushContext,
                 jobType = jobType,
                 jobStatus = jobStatus,
                 messageId = messageId,
@@ -62,7 +59,7 @@ class SlackClient(
     }
 
     private fun generateMessage(
-        messageable: Messageable,
+        githubPushContext: GithubPushContext,
         jobType: JobType,
         jobStatus: JobStatus,
         messageId: String? = null,
@@ -89,7 +86,7 @@ class SlackClient(
             )
         )
 
-        return messageable.toMessage(
+        return githubPushContext.toMessage(
             serviceName = serviceName,
             serviceEmoji = serviceEmoji,
             slackChannelId = slackChannelId,
