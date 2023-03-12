@@ -1,11 +1,7 @@
 package com.monta.slack.notifier.service
 
 import com.monta.slack.notifier.SlackClient
-import com.monta.slack.notifier.model.GithubPullRequest
-import com.monta.slack.notifier.model.GithubPushRequest
-import com.monta.slack.notifier.model.JobStatus
-import com.monta.slack.notifier.model.JobType
-import com.monta.slack.notifier.model.Messageable
+import com.monta.slack.notifier.model.*
 import com.monta.slack.notifier.util.JsonUtil
 import com.monta.slack.notifier.util.writeToOutput
 import kotlinx.serialization.decodeFromString
@@ -14,11 +10,15 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 
 class PublishSlackService(
+    serviceName: String?,
+    serviceEmoji: String?,
     slackToken: String,
     slackChannelId: String,
 ) {
 
     private val slackClient = SlackClient(
+        serviceName = serviceName,
+        serviceEmoji = serviceEmoji,
         slackToken = slackToken,
         slackChannelId = slackChannelId
     )

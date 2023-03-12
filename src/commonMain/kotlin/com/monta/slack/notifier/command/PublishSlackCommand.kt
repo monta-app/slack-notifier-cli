@@ -15,6 +15,17 @@ class PublishSlackCommand : CliktCommand() {
         envvar = "PUBLISH_SLACK_GITHUB_CONTEXT"
     ).required()
 
+
+    private val serviceName: String? by option(
+        help = "Emoji for the app!",
+        envvar = "PUBLISH_SLACK_SERVICE_NAME"
+    )
+
+    private val serviceEmoji: String? by option(
+        help = "Emoji for the app!",
+        envvar = "PUBLISH_SLACK_SERVICE_EMOJI"
+    )
+
     private val jobType: String by option(
         help = "Job Type",
         envvar = "PUBLISH_SLACK_JOB_TYPE"
@@ -43,6 +54,8 @@ class PublishSlackCommand : CliktCommand() {
     override fun run() {
         runBlocking {
             PublishSlackService(
+                serviceName = serviceName,
+                serviceEmoji = serviceEmoji,
                 slackToken = slackToken,
                 slackChannelId = slackChannelId
             ).publish(

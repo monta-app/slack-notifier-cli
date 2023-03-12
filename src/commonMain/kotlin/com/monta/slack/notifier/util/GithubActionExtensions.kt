@@ -2,11 +2,7 @@ package com.monta.slack.notifier.util
 
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.toKString
-import platform.posix.EOF
-import platform.posix.fclose
-import platform.posix.fopen
-import platform.posix.fputs
-import platform.posix.getenv
+import platform.posix.*
 
 fun writeToOutput(key: String, value: String) {
 

@@ -1,5 +1,6 @@
 package com.monta.slack.notifier.model
 
+import com.monta.slack.notifier.util.buildTitle
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -73,8 +74,6 @@ data class GithubPushRequest(
     val action: String?, // __run
 ) : Messageable {
 
-    private val repositoryName: String? = repository?.split("/")?.last()
-
     @Serializable
     data class Event(
         @SerialName("after")
@@ -135,6 +134,8 @@ data class GithubPushRequest(
     }
 
     override fun toMessage(
+        serviceName: String?,
+        serviceEmoji: String?,
         slackChannelId: String,
         messageId: String?,
         attachments: List<SlackMessage.Attachment>?,
@@ -150,11 +151,7 @@ data class GithubPushRequest(
                     type = "header",
                     text = SlackBlock.Text(
                         type = "plain_text",
-                        text = if (repositoryName != null) {
-                            "$repositoryName - $workflow"
-                        } else {
-                            "$workflow"
-                        }
+                        text = buildTitle(repository, workflow, serviceName, serviceEmoji)
                     )
                 ),
                 SlackBlock(

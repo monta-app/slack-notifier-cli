@@ -14,6 +14,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 
 class SlackClient(
+    private val serviceName: String?,
+    private val serviceEmoji: String?,
     private val slackToken: String,
     private val slackChannelId: String,
 ) {
@@ -88,6 +90,8 @@ class SlackClient(
         )
 
         return messageable.toMessage(
+            serviceName = serviceName,
+            serviceEmoji = serviceEmoji,
             slackChannelId = slackChannelId,
             messageId = messageId,
             attachments = attachments.values.toList()
