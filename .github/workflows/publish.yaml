@@ -45,6 +45,7 @@ jobs:
     steps:
       - name: Download a single artifact
         uses: actions/download-artifact@v3
+        id: download
         with:
           name: slack-notifier-cli
       - name: Give artifact correct permissions
@@ -64,7 +65,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: slack-notifier-cli
+          file: ${{steps.download.outputs.download-path}}
           asset_name: slack-notifier-cli
           tag: ${{ github.ref }}
           overwrite: true
