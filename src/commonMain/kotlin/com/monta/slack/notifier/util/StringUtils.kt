@@ -16,11 +16,11 @@ fun buildTitle(
 
     return when {
         !title.isNullOrBlank() && !serviceEmoji.isNullOrBlank() -> {
-            "$serviceEmoji $serviceName - $workflow"
+            "$serviceEmoji $title - $workflow"
         }
 
         !title.isNullOrBlank() -> {
-            "$serviceName - $workflow"
+            "$title - $workflow"
         }
 
         else -> {
@@ -44,7 +44,7 @@ private fun String?.toTitle(): String? {
     return this?.split("/")
         ?.last()
         ?.split("-")
-        ?.joinToString { word ->
+        ?.joinToString(" ") { word ->
             word.replaceFirstChar { firstChar ->
                 if (firstChar.isLowerCase()) {
                     firstChar.titlecase()
