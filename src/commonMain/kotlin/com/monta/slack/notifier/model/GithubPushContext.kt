@@ -99,15 +99,18 @@ data class GithubPushContext(
 
         val commit = event?.headCommit
 
+        val title = buildTitle(repository, workflow, serviceName, serviceEmoji)
+
         return SlackMessage(
             channel = slackChannelId,
             ts = messageId,
+            text = title,
             blocks = listOf(
                 SlackBlock(
                     type = "header",
                     text = SlackBlock.Text(
-                        type = "plain_text",
-                        text = buildTitle(repository, workflow, serviceName, serviceEmoji)
+                        type = "mrkdwn",
+                        text = title
                     )
                 ),
                 SlackBlock(
