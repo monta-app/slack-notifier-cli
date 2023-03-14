@@ -13,6 +13,8 @@ data class GithubPushContext(
     val sha: String? = null, // c545a1613f18937a88a13935c4d644e8f81b71d6
     @SerialName("repository")
     val repository: String? = null, // monta-app/service-integrations
+    @SerialName("run_id")
+    val runId: String? = null,  // 4399287439
     @SerialName("actor")
     val actor: String? = null, // BrianEstrada
     @SerialName("triggering_actor")
@@ -76,6 +78,17 @@ data class GithubPushContext(
         }
     }
 
+    private fun getSanitizedMessage(): String? {
+        return event?.headCommit?.message
+            ?.replace("\n", " ")
+            ?.replace("\r", " ")
+            ?.take(120)
+    }
+
+    private fun getRunUrl(): String {
+        return "https://github.com/$repository/actions/runs/$runId"
+    }
+
     fun toMessage(
         serviceName: String?,
         serviceEmoji: String?,
@@ -109,11 +122,15 @@ data class GithubPushContext(
                         ),
                         SlackBlock.Text(
                             type = "mrkdwn",
+                            text = " \n*Run:*\n<${getRunUrl()}|${runId}>",
+                        ),
+                        SlackBlock.Text(
+                            type = "mrkdwn",
                             text = " \n*Comitter:*\n${commit?.committer?.displayName}",
                         ),
                         SlackBlock.Text(
                             type = "mrkdwn",
-                            text = " \n*Message:*\n<${commit?.url}|${commit?.message}>",
+                            text = " \n*Message:*\n<${commit?.url}|${getSanitizedMessage()}>",
                         ),
                         SlackBlock.Text(
                             type = "mrkdwn",
