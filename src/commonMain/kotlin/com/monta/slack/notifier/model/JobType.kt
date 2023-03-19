@@ -11,6 +11,9 @@ enum class JobType(
     ),
     Deploy(
         label = "Deploy :package:"
+    ),
+    PublishDocs(
+        label = "Publish Docs :jigsaw:"
     );
 
     companion object {
