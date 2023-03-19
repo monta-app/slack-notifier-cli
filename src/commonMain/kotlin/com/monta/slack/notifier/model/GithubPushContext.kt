@@ -109,7 +109,7 @@ data class GithubPushContext(
                 SlackBlock(
                     type = "header",
                     text = SlackBlock.Text(
-                        type = "mrkdwn",
+                        type = "plain_text",
                         text = title
                     )
                 ),
