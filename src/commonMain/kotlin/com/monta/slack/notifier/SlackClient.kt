@@ -6,9 +6,9 @@ import com.monta.slack.notifier.util.client
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.utils.io.charsets.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 
 class SlackClient(
     private val serviceName: String?,
@@ -125,7 +125,7 @@ class SlackClient(
 
         val response = client.post(url) {
             header("Authorization", "Bearer $slackToken")
-            contentType(ContentType.Application.Json)
+            contentType(ContentType.Application.Json.withParameter("charset", Charsets.UTF_8.name))
             setBody(message)
         }
 
