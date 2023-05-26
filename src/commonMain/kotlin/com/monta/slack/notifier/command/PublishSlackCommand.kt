@@ -15,7 +15,6 @@ class PublishSlackCommand : CliktCommand() {
         envvar = "PUBLISH_SLACK_GITHUB_CONTEXT"
     ).required()
 
-
     private val serviceName: String? by option(
         help = "Emoji for the app!",
         envvar = "PUBLISH_SLACK_SERVICE_NAME"
@@ -62,7 +61,7 @@ class PublishSlackCommand : CliktCommand() {
                 githubContext = githubContext,
                 jobType = JobType.fromString(jobType),
                 jobStatus = JobStatus.fromString(jobStatus),
-                slackMessageId = slackMessageId,
+                slackMessageId = slackMessageId
             )
         }
     }

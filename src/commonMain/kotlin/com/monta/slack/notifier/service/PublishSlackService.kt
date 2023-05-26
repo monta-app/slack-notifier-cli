@@ -6,13 +6,12 @@ import com.monta.slack.notifier.model.JobStatus
 import com.monta.slack.notifier.model.JobType
 import com.monta.slack.notifier.util.JsonUtil
 import com.monta.slack.notifier.util.writeToOutput
-import kotlinx.serialization.decodeFromString
 
 class PublishSlackService(
     serviceName: String?,
     serviceEmoji: String?,
     slackToken: String,
-    slackChannelId: String,
+    slackChannelId: String
 ) {
 
     private val slackClient = SlackClient(
@@ -26,23 +25,22 @@ class PublishSlackService(
         githubContext: String,
         jobType: JobType,
         jobStatus: JobStatus,
-        slackMessageId: String?,
+        slackMessageId: String?
     ): String {
-
         val githubPushContext = JsonUtil.instance.decodeFromString<GithubPushContext>(githubContext)
 
         val messageId = if (slackMessageId.isNullOrBlank()) {
             slackClient.create(
                 githubPushContext = githubPushContext,
                 jobType = jobType,
-                jobStatus = jobStatus,
+                jobStatus = jobStatus
             )
         } else {
             slackClient.update(
                 messageId = slackMessageId,
                 githubPushContext = githubPushContext,
                 jobType = jobType,
-                jobStatus = jobStatus,
+                jobStatus = jobStatus
             )
         }
 
