@@ -1,6 +1,5 @@
 package com.monta.slack.notifier.model
 
-
 import com.monta.slack.notifier.util.buildTitle
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -14,7 +13,7 @@ data class GithubPushContext(
     @SerialName("repository")
     val repository: String? = null, // monta-app/service-integrations
     @SerialName("run_id")
-    val runId: String? = null,  // 4399287439
+    val runId: String? = null, // 4399287439
     @SerialName("actor")
     val actor: String? = null, // BrianEstrada
     @SerialName("triggering_actor")
@@ -58,7 +57,7 @@ data class GithubPushContext(
         @SerialName("tree_id")
         val treeId: String? = null, // f3667a7332372de2ccb6a1cc5c310e780915a28e
         @SerialName("url")
-        val url: String? = null// https://github.com/monta-app/service-integrations/commit/c545a1613f18937a88a13935c4d644e8f81b71d6
+        val url: String? = null // https://github.com/monta-app/service-integrations/commit/c545a1613f18937a88a13935c4d644e8f81b71d6
     )
 
     @Serializable
@@ -68,7 +67,7 @@ data class GithubPushContext(
         @SerialName("name")
         val name: String? = null, // Brian Estrada
         @SerialName("username")
-        val username: String? = null// BrianEstrada
+        val username: String? = null // BrianEstrada
     ) {
         val displayName: String? = when {
             email == null && name == null -> null
@@ -94,9 +93,8 @@ data class GithubPushContext(
         serviceEmoji: String?,
         slackChannelId: String,
         messageId: String?,
-        attachments: List<SlackMessage.Attachment>?,
+        attachments: List<SlackMessage.Attachment>?
     ): SlackMessage {
-
         val commit = event?.headCommit
 
         val title = buildTitle(repository, workflow, serviceName, serviceEmoji)
@@ -121,23 +119,23 @@ data class GithubPushContext(
                     fields = listOf(
                         SlackBlock.Text(
                             type = "mrkdwn",
-                            text = " \n*Branch:*\n${refName}",
+                            text = " \n*Branch:*\n$refName"
                         ),
                         SlackBlock.Text(
                             type = "mrkdwn",
-                            text = " \n*Run:*\n<${getRunUrl()}|${runId}>",
+                            text = " \n*Run:*\n<${getRunUrl()}|$runId>"
                         ),
                         SlackBlock.Text(
                             type = "mrkdwn",
-                            text = " \n*Comitter:*\n${commit?.committer?.displayName}",
+                            text = " \n*Comitter:*\n${commit?.committer?.displayName}"
                         ),
                         SlackBlock.Text(
                             type = "mrkdwn",
-                            text = " \n*Message:*\n<${commit?.url}|${getSanitizedMessage()}>",
+                            text = " \n*Message:*\n<${commit?.url}|${getSanitizedMessage()}>"
                         ),
                         SlackBlock.Text(
                             type = "mrkdwn",
-                            text = " \n*SHA:*\n<${commit?.url}|${commit?.id}>",
+                            text = " \n*SHA:*\n<${commit?.url}|${commit?.id}>"
                         )
                     )
                 ),

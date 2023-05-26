@@ -12,11 +12,13 @@ val client by lazy {
     HttpClient(Curl) {
         expectSuccess = false
         install(ContentNegotiation) {
-            json(Json {
-                explicitNulls = false
-                isLenient = true
-                ignoreUnknownKeys = true
-            })
+            json(
+                Json {
+                    explicitNulls = false
+                    isLenient = true
+                    ignoreUnknownKeys = true
+                }
+            )
         }
     }
 }

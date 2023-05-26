@@ -2,7 +2,7 @@ package com.monta.slack.notifier.model
 
 enum class JobStatus(
     val message: String,
-    val color: String,
+    val color: String
 ) {
     Progress(
         message = "In Progress :construction:",

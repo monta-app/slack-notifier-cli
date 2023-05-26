@@ -1,18 +1,15 @@
 package com.monta.slack.notifier.util
 
-
 fun buildTitle(
     repository: String?,
     workflow: String?,
     serviceName: String?,
     serviceEmoji: String?
 ): String {
-
     val title: String? = getTitle(
         serviceName = serviceName,
         repository = repository
     )
-
 
     return when {
         !title.isNullOrBlank() && !serviceEmoji.isNullOrBlank() -> {

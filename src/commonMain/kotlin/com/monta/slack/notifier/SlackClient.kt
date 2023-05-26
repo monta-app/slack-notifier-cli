@@ -1,6 +1,9 @@
 package com.monta.slack.notifier
 
-import com.monta.slack.notifier.model.*
+import com.monta.slack.notifier.model.GithubPushContext
+import com.monta.slack.notifier.model.JobStatus
+import com.monta.slack.notifier.model.JobType
+import com.monta.slack.notifier.model.SlackMessage
 import com.monta.slack.notifier.util.JsonUtil
 import com.monta.slack.notifier.util.client
 import io.ktor.client.request.*
@@ -14,21 +17,20 @@ class SlackClient(
     private val serviceName: String?,
     private val serviceEmoji: String?,
     private val slackToken: String,
-    private val slackChannelId: String,
+    private val slackChannelId: String
 ) {
 
     suspend fun create(
         githubPushContext: GithubPushContext,
         jobType: JobType,
-        jobStatus: JobStatus,
+        jobStatus: JobStatus
     ): String {
-
         val response = makeSlackRequest(
             url = "https://slack.com/api/chat.postMessage",
             message = generateMessage(
                 githubPushContext = githubPushContext,
                 jobType = jobType,
-                jobStatus = jobStatus,
+                jobStatus = jobStatus
             )
         )
 
@@ -39,9 +41,8 @@ class SlackClient(
         messageId: String,
         githubPushContext: GithubPushContext,
         jobType: JobType,
-        jobStatus: JobStatus,
+        jobStatus: JobStatus
     ): String {
-
         val previousMessage = getSlackMessageById(messageId)
 
         val response = makeSlackRequest(
@@ -51,7 +52,7 @@ class SlackClient(
                 jobType = jobType,
                 jobStatus = jobStatus,
                 messageId = messageId,
-                previousAttachments = previousMessage?.messages?.firstOrNull()?.attachments,
+                previousAttachments = previousMessage?.messages?.firstOrNull()?.attachments
             )
         )
 
@@ -63,9 +64,8 @@ class SlackClient(
         jobType: JobType,
         jobStatus: JobStatus,
         messageId: String? = null,
-        previousAttachments: List<SlackMessage.Attachment>? = null,
+        previousAttachments: List<SlackMessage.Attachment>? = null
     ): SlackMessage {
-
         val attachments = mutableMapOf<JobType, SlackMessage.Attachment>()
 
         previousAttachments?.forEach { previousAttachment ->
@@ -96,9 +96,8 @@ class SlackClient(
     }
 
     private suspend fun getSlackMessageById(
-        messageId: String,
+        messageId: String
     ): MessageResponse? {
-
         val response = client.get {
             header("Authorization", "Bearer $slackToken")
             url {
@@ -122,7 +121,6 @@ class SlackClient(
     }
 
     private suspend fun makeSlackRequest(url: String, message: SlackMessage): Response? {
-
         val response = client.post(url) {
             header("Authorization", "Bearer $slackToken")
             contentType(ContentType.Application.Json.withParameter("charset", Charsets.UTF_8.name))
@@ -147,7 +145,7 @@ class SlackClient(
         @SerialName("channel")
         val channel: String, // C024BE91L
         @SerialName("ts")
-        val ts: String, // 1401383885.000061
+        val ts: String // 1401383885.000061
     )
 
     @Serializable
@@ -155,6 +153,6 @@ class SlackClient(
         @SerialName("ok")
         val ok: Boolean, // true
         @SerialName("messages")
-        val messages: List<SlackMessage>,
+        val messages: List<SlackMessage>
     )
 }

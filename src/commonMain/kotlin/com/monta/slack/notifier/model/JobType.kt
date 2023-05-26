@@ -1,10 +1,10 @@
 package com.monta.slack.notifier.model
 
 enum class JobType(
-    val label: String,
+    val label: String
 ) {
     Test(
-        label = "Test :test_tube:",
+        label = "Test :test_tube:"
     ),
     Build(
         label = "Build :building_construction:️"
