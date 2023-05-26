@@ -53,16 +53,22 @@ class PublishSlackCommand : CliktCommand() {
     override fun run() {
         runBlocking {
             PublishSlackService(
-                serviceName = serviceName,
-                serviceEmoji = serviceEmoji,
+                serviceName = serviceName.valueOrNull(),
+                serviceEmoji = serviceEmoji.valueOrNull(),
                 slackToken = slackToken,
                 slackChannelId = slackChannelId
             ).publish(
                 githubContext = githubContext,
                 jobType = JobType.fromString(jobType),
                 jobStatus = JobStatus.fromString(jobStatus),
-                slackMessageId = slackMessageId
+                slackMessageId = slackMessageId.valueOrNull()
             )
         }
     }
+
+    /**
+     * Needed for optional parameters as the return the empty string instead of null
+     * if set via ENV variables (as we do from our GitHub Actions)
+     */
+    private fun String?.valueOrNull() = if (this.isNullOrBlank()) null else this
 }
