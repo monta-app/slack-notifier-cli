@@ -3,16 +3,38 @@ package com.monta.slack.notifier.command
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
+import com.monta.slack.notifier.model.GithubPushContext
 import com.monta.slack.notifier.model.JobStatus
 import com.monta.slack.notifier.model.JobType
 import com.monta.slack.notifier.service.PublishSlackService
+import com.monta.slack.notifier.util.JsonUtil
+import com.monta.slack.notifier.util.readStringFromFile
 import kotlinx.coroutines.runBlocking
 
 class PublishSlackCommand : CliktCommand() {
+    val githubEventPath: String by option(
+        help = "Github Context event json file path",
+        envvar = "GITHUB_EVENT_PATH"
+    ).required()
 
-    private val githubContext: String by option(
-        help = "Github Context",
-        envvar = "PUBLISH_SLACK_GITHUB_CONTEXT"
+    val githubRepository: String by option(
+        help = "Github Context repository",
+        envvar = "GITHUB_REPOSITORY"
+    ).required()
+
+    val githubRunId: String by option(
+        help = "Github Context run id",
+        envvar = "GITHUB_RUN_ID"
+    ).required()
+
+    val githubWorkflow: String by option(
+        help = "Github Context workflow",
+        envvar = "GITHUB_WORKFLOW"
+    ).required()
+
+    val githubRefName: String by option(
+        help = "Github Context ref name",
+        envvar = "GITHUB_REF_NAME"
     ).required()
 
     private val serviceName: String? by option(
@@ -52,18 +74,31 @@ class PublishSlackCommand : CliktCommand() {
 
     override fun run() {
         runBlocking {
+            val githubPushContext = getGithubPushContext()
             PublishSlackService(
                 serviceName = serviceName.valueOrNull(),
                 serviceEmoji = serviceEmoji.valueOrNull(),
                 slackToken = slackToken,
                 slackChannelId = slackChannelId
             ).publish(
-                githubContext = githubContext,
+                githubPushContext = githubPushContext,
                 jobType = JobType.fromString(jobType),
                 jobStatus = JobStatus.fromString(jobStatus),
                 slackMessageId = slackMessageId.valueOrNull()
             )
         }
+    }
+
+    private fun getGithubPushContext(): GithubPushContext {
+        val eventJson = readStringFromFile(githubEventPath)
+        val event = JsonUtil.instance.decodeFromString<GithubPushContext.Event>(eventJson)
+        return GithubPushContext(
+            repository = githubRepository,
+            runId = githubRunId,
+            workflow = githubWorkflow,
+            event = event,
+            refName = githubRefName
+        )
     }
 
     /**
