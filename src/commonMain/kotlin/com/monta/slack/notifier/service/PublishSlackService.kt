@@ -4,7 +4,6 @@ import com.monta.slack.notifier.SlackClient
 import com.monta.slack.notifier.model.GithubPushContext
 import com.monta.slack.notifier.model.JobStatus
 import com.monta.slack.notifier.model.JobType
-import com.monta.slack.notifier.util.JsonUtil
 import com.monta.slack.notifier.util.writeToOutput
 
 class PublishSlackService(
@@ -22,13 +21,11 @@ class PublishSlackService(
     )
 
     suspend fun publish(
-        githubContext: String,
+        githubPushContext: GithubPushContext,
         jobType: JobType,
         jobStatus: JobStatus,
         slackMessageId: String?
     ): String {
-        val githubPushContext = JsonUtil.instance.decodeFromString<GithubPushContext>(githubContext)
-
         val messageId = if (slackMessageId.isNullOrBlank()) {
             slackClient.create(
                 githubPushContext = githubPushContext,
