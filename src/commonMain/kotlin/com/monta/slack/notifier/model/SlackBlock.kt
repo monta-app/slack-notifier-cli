@@ -10,7 +10,7 @@ class SlackBlock(
     @SerialName("text")
     val text: Text? = null,
     @SerialName("fields")
-    val fields: List<Text>? = null
+    val fields: List<Text>? = null,
 ) {
     @Serializable
     class Text(
@@ -21,6 +21,6 @@ class SlackBlock(
         @SerialName("emoji")
         val emoji: Boolean = true,
         @SerialName("short")
-        val short: Boolean = true
+        val short: Boolean = true,
     )
 }

@@ -1,5 +1,6 @@
 package com.monta.slack.notifier.util
 
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.toKString
 import platform.posix.EOF
@@ -8,7 +9,11 @@ import platform.posix.fopen
 import platform.posix.fputs
 import platform.posix.getenv
 
-fun writeToOutput(key: String, value: String) {
+@OptIn(ExperimentalForeignApi::class)
+fun writeToOutput(
+    key: String,
+    value: String,
+) {
     println("Writing to output $key $value")
 
     val githubOutput = getenv("GITHUB_OUTPUT")?.toKString()

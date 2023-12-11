@@ -9,7 +9,7 @@ data class SlackMessage(
     val ts: String? = null,
     val text: String? = null,
     val blocks: List<SlackBlock>? = null,
-    val attachments: List<Attachment>? = null
+    val attachments: List<Attachment>? = null,
 ) {
     @Serializable
     data class Attachment(
@@ -40,7 +40,7 @@ data class SlackMessage(
         @SerialName("footer_icon")
         val footerIcon: String? = null,
         @SerialName("blocks")
-        val blocks: List<SlackBlock>? = null
+        val blocks: List<SlackBlock>? = null,
     ) {
 
         val jobType = JobType.fromLabel(
@@ -54,7 +54,7 @@ data class SlackMessage(
             @SerialName("value")
             val value: String, // This field's value
             @SerialName("short")
-            val short: Boolean // false
+            val short: Boolean, // false
         )
 
         @Serializable
@@ -64,7 +64,7 @@ data class SlackMessage(
             @SerialName("value")
             val text: String, // This field's value
             @SerialName("url")
-            val url: String // false
+            val url: String, // false
         )
     }
 }

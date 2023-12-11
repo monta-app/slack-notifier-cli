@@ -4,7 +4,7 @@ fun buildTitle(
     repository: String?,
     workflow: String?,
     serviceName: String?,
-    serviceEmoji: String?
+    serviceEmoji: String?,
 ): String {
     val title: String? = getTitle(
         serviceName = serviceName,
@@ -28,7 +28,7 @@ fun buildTitle(
 
 private fun getTitle(
     serviceName: String?,
-    repository: String?
+    repository: String?,
 ): String? {
     return if (serviceName.isNullOrBlank()) {
         repository.toTitle()

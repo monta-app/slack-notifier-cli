@@ -10,7 +10,7 @@ class PublishSlackService(
     serviceName: String?,
     serviceEmoji: String?,
     slackToken: String,
-    slackChannelId: String
+    slackChannelId: String,
 ) {
 
     private val slackClient = SlackClient(
@@ -24,7 +24,7 @@ class PublishSlackService(
         githubPushContext: GithubPushContext,
         jobType: JobType,
         jobStatus: JobStatus,
-        slackMessageId: String?
+        slackMessageId: String?,
     ): String {
         val messageId = if (slackMessageId.isNullOrBlank()) {
             slackClient.create(

@@ -2,7 +2,7 @@ package com.monta.slack.notifier.model
 
 enum class JobStatus(
     val message: String,
-    val color: String
+    val color: String,
 ) {
     Progress(
         message = "In Progress :construction:",
@@ -23,7 +23,8 @@ enum class JobStatus(
     Unknown(
         message = "Something went wrong :question:",
         color = "#DBAB09"
-    );
+    ),
+    ;
 
     companion object {
         fun fromString(value: String?): JobStatus {

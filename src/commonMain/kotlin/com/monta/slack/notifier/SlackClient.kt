@@ -17,13 +17,13 @@ class SlackClient(
     private val serviceName: String?,
     private val serviceEmoji: String?,
     private val slackToken: String,
-    private val slackChannelId: String
+    private val slackChannelId: String,
 ) {
 
     suspend fun create(
         githubPushContext: GithubPushContext,
         jobType: JobType,
-        jobStatus: JobStatus
+        jobStatus: JobStatus,
     ): String {
         val response = makeSlackRequest(
             url = "https://slack.com/api/chat.postMessage",
@@ -41,7 +41,7 @@ class SlackClient(
         messageId: String,
         githubPushContext: GithubPushContext,
         jobType: JobType,
-        jobStatus: JobStatus
+        jobStatus: JobStatus,
     ): String {
         val previousMessage = getSlackMessageById(messageId)
 
@@ -64,7 +64,7 @@ class SlackClient(
         jobType: JobType,
         jobStatus: JobStatus,
         messageId: String? = null,
-        previousAttachments: List<SlackMessage.Attachment>? = null
+        previousAttachments: List<SlackMessage.Attachment>? = null,
     ): SlackMessage {
         val attachments = mutableMapOf<JobType, SlackMessage.Attachment>()
 
@@ -96,7 +96,7 @@ class SlackClient(
     }
 
     private suspend fun getSlackMessageById(
-        messageId: String
+        messageId: String,
     ): MessageResponse? {
         val response = client.get {
             header("Authorization", "Bearer $slackToken")
@@ -145,7 +145,7 @@ class SlackClient(
         @SerialName("channel")
         val channel: String, // C024BE91L
         @SerialName("ts")
-        val ts: String // 1401383885.000061
+        val ts: String, // 1401383885.000061
     )
 
     @Serializable
@@ -153,6 +153,6 @@ class SlackClient(
         @SerialName("ok")
         val ok: Boolean, // true
         @SerialName("messages")
-        val messages: List<SlackMessage>
+        val messages: List<SlackMessage>,
     )
 }

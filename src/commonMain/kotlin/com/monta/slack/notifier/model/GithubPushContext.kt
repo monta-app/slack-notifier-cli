@@ -27,7 +27,7 @@ data class GithubPushContext(
     @SerialName("ref_name")
     val refName: String? = null, // develop
     @SerialName("ref_type")
-    val refType: String? = null // branch
+    val refType: String? = null, // branch
 ) {
 
     @Serializable
@@ -37,7 +37,7 @@ data class GithubPushContext(
         @SerialName("pusher")
         val pusher: Committer? = null,
         @SerialName("ref")
-        val ref: String? = null // refs/heads/develop
+        val ref: String? = null, // refs/heads/develop
     )
 
     @Serializable
@@ -57,7 +57,7 @@ data class GithubPushContext(
         @SerialName("tree_id")
         val treeId: String? = null, // f3667a7332372de2ccb6a1cc5c310e780915a28e
         @SerialName("url")
-        val url: String? = null // https://github.com/monta-app/service-integrations/commit/c545a1613f18937a88a13935c4d644e8f81b71d6
+        val url: String? = null, // https://github.com/monta-app/service-integrations/commit/c545a1613f18937a88a13935c4d644e8f81b71d6
     )
 
     @Serializable
@@ -67,7 +67,7 @@ data class GithubPushContext(
         @SerialName("name")
         val name: String? = null, // Brian Estrada
         @SerialName("username")
-        val username: String? = null // BrianEstrada
+        val username: String? = null, // BrianEstrada
     ) {
         val displayName: String? = when {
             email == null && name == null -> null
@@ -93,7 +93,7 @@ data class GithubPushContext(
         serviceEmoji: String?,
         slackChannelId: String,
         messageId: String?,
-        attachments: List<SlackMessage.Attachment>?
+        attachments: List<SlackMessage.Attachment>?,
     ): SlackMessage {
         val commit = event?.headCommit
 
