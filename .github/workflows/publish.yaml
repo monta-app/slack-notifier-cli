@@ -34,7 +34,7 @@ jobs:
           cp build/bin/common/releaseExecutable/slack-notifier-cli.kexe ./slack-notifier-cli
           chmod +x ./slack-notifier-cli
       - name: Upload executable
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: slack-notifier-cli
           path: slack-notifier-cli
@@ -59,7 +59,7 @@ jobs:
           slack-token: ${{ secrets.SLACK_APP_TOKEN }}
           slack-channel: "#releases"
       - name: Download a single artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: slack-notifier-cli
       - name: Upload binaries to release
