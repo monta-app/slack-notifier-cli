@@ -4,10 +4,12 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.monta.slack.notifier.model.GithubPushContext
+import com.monta.slack.notifier.model.GithubTrunkBasedPushContext
 import com.monta.slack.notifier.model.JobStatus
 import com.monta.slack.notifier.model.JobType
 import com.monta.slack.notifier.service.PublishSlackService
 import com.monta.slack.notifier.util.JsonUtil
+import com.monta.slack.notifier.util.populateEventFromTrunkBasedEvent
 import com.monta.slack.notifier.util.readStringFromFile
 import kotlinx.coroutines.runBlocking
 
@@ -91,7 +93,13 @@ class PublishSlackCommand : CliktCommand() {
 
     private fun getGithubPushContext(): GithubPushContext {
         val eventJson = readStringFromFile(githubEventPath)
-        val event = JsonUtil.instance.decodeFromString<GithubPushContext.Event>(eventJson)
+        var event = JsonUtil.instance.decodeFromString<GithubPushContext.Event>(eventJson)
+
+        // In builds from trunk based workflows, the json event is different
+        // We use this hack to populate the original event with new info
+        if (event.headCommit == null) {
+            event = populateEventFromTrunkBasedEvent(eventJson, event)
+        }
         return GithubPushContext(
             repository = githubRepository,
             runId = githubRunId,

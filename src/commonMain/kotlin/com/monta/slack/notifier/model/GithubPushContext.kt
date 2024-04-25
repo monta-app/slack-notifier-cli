@@ -33,7 +33,7 @@ data class GithubPushContext(
     @Serializable
     data class Event(
         @SerialName("head_commit")
-        val headCommit: Commit? = null,
+        var headCommit: Commit? = null,
         @SerialName("pusher")
         val pusher: Committer? = null,
         @SerialName("ref")
