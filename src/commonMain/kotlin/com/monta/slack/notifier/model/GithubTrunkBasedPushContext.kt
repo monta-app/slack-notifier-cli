@@ -12,19 +12,19 @@ data class GithubTrunkBasedPushContext(
     // Where each thing we need to populate the slack message are listed
     @Serializable
     data class PullRequestHead(
-        @SerialName("ref") val ref: String, //  1. First var, Name of branch
+        @SerialName("ref") val ref: String,
     )
 
     @Serializable
     data class PullRequest(
         @SerialName("head") val head: PullRequestHead,
-        @SerialName("title") val title: String, //  5. Fifth var, Name of message
+        @SerialName("title") val title: String,
         @SerialName("user") val user: PullRequestUser
     )
 
     @Serializable
     data class PullRequestUser(
-        @SerialName("login") val login: String //  2. second var, Name of comitter
+        @SerialName("login") val login: String
     )
 
     @Serializable
@@ -34,7 +34,7 @@ data class GithubTrunkBasedPushContext(
 
     @Serializable
     data class Event(
-        @SerialName("after") val sha: String, // 3. Third var, SHA
+        @SerialName("after") val sha: String,
         @SerialName("pull_request") val pullRequest: PullRequest,
         @SerialName("repository") val repository: Repository,
     )
