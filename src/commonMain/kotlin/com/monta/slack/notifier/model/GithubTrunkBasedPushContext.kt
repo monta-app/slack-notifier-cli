@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class GithubTrunkBasedPushContext(
     @SerialName("run_id")
     val runId: String? = null, // 4. Fourth var, Name of run (should be )
-){
+) {
     // In this class we grab variables from a trunk based event flow
     // Where each thing we need to populate the slack message are listed
     @Serializable
@@ -19,17 +19,17 @@ data class GithubTrunkBasedPushContext(
     data class PullRequest(
         @SerialName("head") val head: PullRequestHead,
         @SerialName("title") val title: String,
-        @SerialName("user") val user: PullRequestUser
+        @SerialName("user") val user: PullRequestUser,
     )
 
     @Serializable
     data class PullRequestUser(
-        @SerialName("login") val login: String
+        @SerialName("login") val login: String,
     )
 
     @Serializable
     data class Repository(
-        @SerialName("full_name") val fullName: String
+        @SerialName("full_name") val fullName: String,
     )
 
     @Serializable
