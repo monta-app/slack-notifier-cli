@@ -1,7 +1,7 @@
 package com.monta.slack.notifier.service
 
 import com.monta.slack.notifier.SlackClient
-import com.monta.slack.notifier.model.GithubPushContext
+import com.monta.slack.notifier.model.GithubEvent
 import com.monta.slack.notifier.model.JobStatus
 import com.monta.slack.notifier.model.JobType
 import com.monta.slack.notifier.util.writeToOutput
@@ -21,21 +21,21 @@ class PublishSlackService(
     )
 
     suspend fun publish(
-        githubPushContext: GithubPushContext,
+        githubEvent: GithubEvent,
         jobType: JobType,
         jobStatus: JobStatus,
         slackMessageId: String?,
     ): String {
         val messageId = if (slackMessageId.isNullOrBlank()) {
             slackClient.create(
-                githubPushContext = githubPushContext,
+                githubEvent = githubEvent,
                 jobType = jobType,
                 jobStatus = jobStatus
             )
         } else {
             slackClient.update(
                 messageId = slackMessageId,
-                githubPushContext = githubPushContext,
+                githubEvent = githubEvent,
                 jobType = jobType,
                 jobStatus = jobStatus
             )
