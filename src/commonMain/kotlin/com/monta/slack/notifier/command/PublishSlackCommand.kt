@@ -4,12 +4,10 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.monta.slack.notifier.model.GithubEvent
-import com.monta.slack.notifier.model.serializers.GithubPushContext
 import com.monta.slack.notifier.model.JobStatus
 import com.monta.slack.notifier.model.JobType
 import com.monta.slack.notifier.model.serializers.BaseGithubContext
 import com.monta.slack.notifier.service.PublishSlackService
-import com.monta.slack.notifier.util.JsonUtil
 import com.monta.slack.notifier.util.populateEventFromJson
 import com.monta.slack.notifier.util.readStringFromFile
 import kotlinx.coroutines.runBlocking
@@ -96,9 +94,8 @@ class PublishSlackCommand : CliktCommand() {
         val baseGithubContext: BaseGithubContext
 
         val eventJson = readStringFromFile(githubEventPath)
-        val event = JsonUtil.instance.decodeFromString<GithubPushContext.Event>(eventJson)
 
-        // The github events can take many shapes, therefore we
+        // The Github events can take many shapes, therefore we
         // sort them and transfer them into a simpler object
         baseGithubContext = populateEventFromJson(eventJson)
 

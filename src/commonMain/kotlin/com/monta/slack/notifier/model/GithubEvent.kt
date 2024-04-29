@@ -8,14 +8,14 @@ class GithubEvent(
     val commitSHA: String?,
     val commitMessage: String?,
     val workflow: String?,
-)  {
-    fun getRunUrl() : String {
+) {
+    fun getRunUrl(): String {
         return "https://github.com/$repository/actions/runs/$runId"
     }
-    fun getCommitUrl() : String {
+    fun getCommitUrl(): String {
         return "https://github.com/$repository/commit/$commitSHA"
     }
-    fun getCommitMessage() : String? {
+    fun getCommitMessage(): String? {
         return commitMessage
             ?.replace("\n", " ")
             ?.replace("\r", " ")

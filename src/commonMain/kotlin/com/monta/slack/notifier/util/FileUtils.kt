@@ -10,10 +10,10 @@ import kotlinx.cinterop.allocArray
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.toKString
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerializationException
 import platform.posix.fclose
 import platform.posix.fgets
 import platform.posix.fopen
-import kotlinx.serialization.MissingFieldException
 
 @OptIn(ExperimentalForeignApi::class)
 fun readStringFromFile(
@@ -49,41 +49,40 @@ fun populateEventFromJson(eventJson: String): BaseGithubContext {
 private fun populateOnJsonPush(eventJson: String): BaseGithubContext? {
     return try {
         val event = JsonUtil.instance.decodeFromString<GithubPushContext.Event>(eventJson)
-
         return BaseGithubContext(
             displayName = event.pusher.displayName,
             sha = event.headCommit.id,
             message = event.headCommit.message
         )
-    } catch (e: MissingFieldException) {
+    } catch (e: SerializationException) {
         null
     }
 }
+
 @OptIn(ExperimentalSerializationApi::class)
 private fun populateOnJsonOpened(eventJson: String): BaseGithubContext? {
     return try {
         val event = JsonUtil.instance.decodeFromString<GithubOpenedContext>(eventJson)
-
         return BaseGithubContext(
             displayName = event.pullRequest.user.login,
             sha = event.pullRequest.head.sha,
             message = event.pullRequest.title
         )
-    } catch (e: MissingFieldException) {
+    } catch (e: SerializationException) {
         null
     }
 }
+
 @OptIn(ExperimentalSerializationApi::class)
 private fun populateOnJsonCreated(eventJson: String): BaseGithubContext? {
     return try {
         val event = JsonUtil.instance.decodeFromString<GithubCreatedContext>(eventJson)
-
         return BaseGithubContext(
             displayName = event.pullRequest.user.login,
             sha = event.sha,
             message = event.pullRequest.title
         )
-    } catch (e: MissingFieldException) {
+    } catch (e: SerializationException) {
         null
     }
 }

@@ -69,7 +69,6 @@ class SlackClient(
         messageId: String?,
         attachments: List<SlackMessage.Attachment>?,
     ): SlackMessage {
-
         val title = buildTitle(githubEvent.repository, githubEvent.workflow, serviceName, serviceEmoji)
 
         return SlackMessage(

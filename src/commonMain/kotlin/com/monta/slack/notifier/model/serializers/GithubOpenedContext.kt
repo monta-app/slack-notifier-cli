@@ -13,10 +13,12 @@ class GithubOpenedContext(
         @SerialName("user") val user: PullRequestUser,
         @SerialName("head") val head: PullRequestHead,
     )
+
     @Serializable
     data class PullRequestHead(
         @SerialName("sha") val sha: String,
     )
+
     @Serializable
     data class PullRequestUser(
         @SerialName("login") val login: String,
