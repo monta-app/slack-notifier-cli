@@ -9,7 +9,6 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.allocArray
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.toKString
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
 import platform.posix.fclose
 import platform.posix.fgets
@@ -45,7 +44,6 @@ fun populateEventFromJson(eventJson: String): BaseGithubContext {
     return populateOnJsonPush(eventJson) ?: populateOnJsonOpened(eventJson) ?: populateOnJsonCreated(eventJson) ?: handleFailure()
 }
 
-@OptIn(ExperimentalSerializationApi::class)
 private fun populateOnJsonPush(eventJson: String): BaseGithubContext? {
     return try {
         val event = JsonUtil.instance.decodeFromString<GithubPushContext.Event>(eventJson)
@@ -59,7 +57,6 @@ private fun populateOnJsonPush(eventJson: String): BaseGithubContext? {
     }
 }
 
-@OptIn(ExperimentalSerializationApi::class)
 private fun populateOnJsonOpened(eventJson: String): BaseGithubContext? {
     return try {
         val event = JsonUtil.instance.decodeFromString<GithubOpenedContext>(eventJson)
@@ -73,7 +70,6 @@ private fun populateOnJsonOpened(eventJson: String): BaseGithubContext? {
     }
 }
 
-@OptIn(ExperimentalSerializationApi::class)
 private fun populateOnJsonCreated(eventJson: String): BaseGithubContext? {
     return try {
         val event = JsonUtil.instance.decodeFromString<GithubCreatedContext>(eventJson)
