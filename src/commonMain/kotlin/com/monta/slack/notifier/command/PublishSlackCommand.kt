@@ -3,12 +3,12 @@ package com.monta.slack.notifier.command
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
-import com.monta.slack.notifier.model.GithubPushContext
+import com.monta.slack.notifier.model.GithubEvent
 import com.monta.slack.notifier.model.JobStatus
 import com.monta.slack.notifier.model.JobType
+import com.monta.slack.notifier.model.serializers.BaseGithubContext
 import com.monta.slack.notifier.service.PublishSlackService
-import com.monta.slack.notifier.util.JsonUtil
-import com.monta.slack.notifier.util.populateEventFromTrunkBasedEvent
+import com.monta.slack.notifier.util.populateEventFromJson
 import com.monta.slack.notifier.util.readStringFromFile
 import kotlinx.coroutines.runBlocking
 
@@ -75,14 +75,14 @@ class PublishSlackCommand : CliktCommand() {
 
     override fun run() {
         runBlocking {
-            val githubPushContext = getGithubPushContext()
+            val githubEvent = getGithubEvent()
             PublishSlackService(
                 serviceName = serviceName.valueOrNull(),
                 serviceEmoji = serviceEmoji.valueOrNull(),
                 slackToken = slackToken,
                 slackChannelId = slackChannelId
             ).publish(
-                githubPushContext = githubPushContext,
+                githubEvent = githubEvent,
                 jobType = JobType.fromString(jobType),
                 jobStatus = JobStatus.fromString(jobStatus),
                 slackMessageId = slackMessageId.valueOrNull()
@@ -90,21 +90,23 @@ class PublishSlackCommand : CliktCommand() {
         }
     }
 
-    private fun getGithubPushContext(): GithubPushContext {
-        val eventJson = readStringFromFile(githubEventPath)
-        var event = JsonUtil.instance.decodeFromString<GithubPushContext.Event>(eventJson)
+    private fun getGithubEvent(): GithubEvent {
+        val baseGithubContext: BaseGithubContext
 
-        // In builds from trunk based workflows, the json event is different
-        // We use this hack to populate the original event with new info
-        if (event.headCommit == null) {
-            event = populateEventFromTrunkBasedEvent(eventJson, event)
-        }
-        return GithubPushContext(
+        val eventJson = readStringFromFile(githubEventPath)
+
+        // The Github events can take many shapes, therefore we
+        // sort them and transfer them into a simpler object
+        baseGithubContext = populateEventFromJson(eventJson)
+
+        return GithubEvent(
             repository = githubRepository,
+            refName = githubRefName,
             runId = githubRunId,
-            workflow = githubWorkflow,
-            event = event,
-            refName = githubRefName
+            displayName = baseGithubContext.displayName,
+            commitSHA = baseGithubContext.sha,
+            commitMessage = baseGithubContext.message,
+            workflow = githubWorkflow
         )
     }
 

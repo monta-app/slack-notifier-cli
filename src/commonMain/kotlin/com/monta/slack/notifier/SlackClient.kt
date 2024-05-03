@@ -1,10 +1,12 @@
 package com.monta.slack.notifier
 
-import com.monta.slack.notifier.model.GithubPushContext
+import com.monta.slack.notifier.model.GithubEvent
 import com.monta.slack.notifier.model.JobStatus
 import com.monta.slack.notifier.model.JobType
+import com.monta.slack.notifier.model.SlackBlock
 import com.monta.slack.notifier.model.SlackMessage
 import com.monta.slack.notifier.util.JsonUtil
+import com.monta.slack.notifier.util.buildTitle
 import com.monta.slack.notifier.util.client
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -21,14 +23,14 @@ class SlackClient(
 ) {
 
     suspend fun create(
-        githubPushContext: GithubPushContext,
+        githubEvent: GithubEvent,
         jobType: JobType,
         jobStatus: JobStatus,
     ): String {
         val response = makeSlackRequest(
             url = "https://slack.com/api/chat.postMessage",
-            message = generateMessage(
-                githubPushContext = githubPushContext,
+            message = generateMessageFromGithubEvent(
+                githubEvent = githubEvent,
                 jobType = jobType,
                 jobStatus = jobStatus
             )
@@ -39,7 +41,7 @@ class SlackClient(
 
     suspend fun update(
         messageId: String,
-        githubPushContext: GithubPushContext,
+        githubEvent: GithubEvent,
         jobType: JobType,
         jobStatus: JobStatus,
     ): String {
@@ -47,8 +49,8 @@ class SlackClient(
 
         val response = makeSlackRequest(
             url = "https://slack.com/api/chat.update",
-            message = generateMessage(
-                githubPushContext = githubPushContext,
+            message = generateMessageFromGithubEvent(
+                githubEvent = githubEvent,
                 jobType = jobType,
                 jobStatus = jobStatus,
                 messageId = messageId,
@@ -59,8 +61,66 @@ class SlackClient(
         return requireNotNull(response?.ts)
     }
 
-    private fun generateMessage(
-        githubPushContext: GithubPushContext,
+    private fun generateSlackMessageFromEvent(
+        githubEvent: GithubEvent,
+        serviceName: String?,
+        serviceEmoji: String?,
+        slackChannelId: String,
+        messageId: String?,
+        attachments: List<SlackMessage.Attachment>?,
+    ): SlackMessage {
+        val title = buildTitle(githubEvent.repository, githubEvent.workflow, serviceName, serviceEmoji)
+
+        return SlackMessage(
+            channel = slackChannelId,
+            ts = messageId,
+            text = title,
+            blocks = listOf(
+                SlackBlock(
+                    type = "header",
+                    text = SlackBlock.Text(
+                        type = "plain_text",
+                        text = title
+                    )
+                ),
+                SlackBlock(
+                    type = "divider"
+                ),
+                SlackBlock(
+                    type = "section",
+                    fields = listOf(
+                        SlackBlock.Text(
+                            type = "mrkdwn",
+                            text = " \n*Branch:*\n${githubEvent.refName}"
+                        ),
+                        SlackBlock.Text(
+                            type = "mrkdwn",
+                            text = " \n*Run:*\n<${githubEvent.getRunUrl()}|${githubEvent.runId}>"
+                        ),
+                        SlackBlock.Text(
+                            type = "mrkdwn",
+                            text = " \n*Comitter:*\n${githubEvent.displayName}"
+                        ),
+                        SlackBlock.Text(
+                            type = "mrkdwn",
+                            text = " \n*Message:*\n<${githubEvent.getCommitUrl()}|${githubEvent.getCommitMessage()}>"
+                        ),
+                        SlackBlock.Text(
+                            type = "mrkdwn",
+                            text = " \n*SHA:*\n<${githubEvent.getCommitUrl()}|${githubEvent.commitSHA}>"
+                        )
+                    )
+                ),
+                SlackBlock(
+                    type = "divider"
+                )
+            ),
+            attachments = attachments
+        )
+    }
+
+    private fun generateMessageFromGithubEvent(
+        githubEvent: GithubEvent,
         jobType: JobType,
         jobStatus: JobStatus,
         messageId: String? = null,
@@ -86,7 +146,8 @@ class SlackClient(
             )
         )
 
-        return githubPushContext.toMessage(
+        return generateSlackMessageFromEvent(
+            githubEvent = githubEvent,
             serviceName = serviceName,
             serviceEmoji = serviceEmoji,
             slackChannelId = slackChannelId,
