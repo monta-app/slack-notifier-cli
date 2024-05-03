@@ -103,11 +103,11 @@ class SlackClient(
                         ),
                         SlackBlock.Text(
                             type = "mrkdwn",
-                            text = " \n*Message:*\n<${githubEvent.getCommitUrl()}|${githubEvent.getCommitMessage()}>"
+                            text = " \n*Message:*\n<${githubEvent.getChangeUrl()}|${githubEvent.getChangeMessage()}>"
                         ),
                         SlackBlock.Text(
                             type = "mrkdwn",
-                            text = " \n*SHA:*\n<${githubEvent.getCommitUrl()}|${githubEvent.commitSHA}>"
+                            text = " \n*Change:*\n<${githubEvent.getChangeUrl()}|${githubEvent.getChangeIdentifier()}>"
                         )
                     )
                 ),

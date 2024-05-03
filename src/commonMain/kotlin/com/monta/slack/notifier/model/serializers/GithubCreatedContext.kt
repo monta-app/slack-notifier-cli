@@ -5,17 +5,17 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class GithubCreatedContext(
-    @SerialName("after") val sha: String,
-    @SerialName("pull_request") val pullRequest: PullRequest,
+    @SerialName("sender") val sender: Sender,
+    @SerialName("issue") val issue: Issue,
 ) {
     @Serializable
-    data class PullRequest(
-        @SerialName("title") val title: String,
-        @SerialName("user") val user: PullRequestUser,
+    data class Sender(
+        @SerialName("login") val login: String,
     )
 
     @Serializable
-    data class PullRequestUser(
-        @SerialName("login") val login: String,
+    data class Issue(
+        @SerialName("title") val title: String,
+        @SerialName("html_url") val url: String,
     )
 }
