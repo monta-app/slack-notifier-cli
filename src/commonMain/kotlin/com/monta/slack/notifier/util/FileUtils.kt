@@ -48,7 +48,6 @@ private fun populateOnJsonPush(eventJson: String): BaseGithubContext? {
     @Suppress("SwallowedException")
     return try {
         val event = JsonUtil.instance.decodeFromString<GithubPushContext.Event>(eventJson)
-        println("Matched with a Push event")
         return BaseGithubContext(
             displayName = event.pusher.displayName,
             sha = event.headCommit.id,
@@ -64,7 +63,6 @@ private fun populateOnJsonOpened(eventJson: String): BaseGithubContext? {
     @Suppress("SwallowedException")
     return try {
         val event = JsonUtil.instance.decodeFromString<GithubOpenedContext>(eventJson)
-        println("Matched with a Opened event")
         return BaseGithubContext(
             displayName = event.pullRequest.user.login,
             sha = event.pullRequest.head.sha,
@@ -80,7 +78,6 @@ private fun populateOnJsonCreated(eventJson: String): BaseGithubContext? {
     @Suppress("SwallowedException")
     return try {
         val event = JsonUtil.instance.decodeFromString<GithubCreatedContext>(eventJson)
-        println("Matched with a Created event")
         return BaseGithubContext(
             displayName = event.sender.login,
             sha = null,
@@ -93,7 +90,6 @@ private fun populateOnJsonCreated(eventJson: String): BaseGithubContext? {
 }
 
 private fun handleFailure(): BaseGithubContext {
-    println("DIDNT MATCH an event :((((")
     return BaseGithubContext(
         displayName = null,
         sha = null,
