@@ -105,8 +105,9 @@ class PublishSlackCommand : CliktCommand() {
             runId = githubRunId,
             displayName = baseGithubContext.displayName,
             commitSHA = baseGithubContext.sha,
-            commitMessage = baseGithubContext.message,
-            workflow = githubWorkflow
+            message = baseGithubContext.message,
+            workflow = githubWorkflow,
+            prUrl = baseGithubContext.prUrl
         )
     }
 

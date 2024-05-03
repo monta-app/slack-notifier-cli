@@ -48,10 +48,12 @@ private fun populateOnJsonPush(eventJson: String): BaseGithubContext? {
     @Suppress("SwallowedException")
     return try {
         val event = JsonUtil.instance.decodeFromString<GithubPushContext.Event>(eventJson)
+        println("Matched with a Push event")
         return BaseGithubContext(
             displayName = event.pusher.displayName,
             sha = event.headCommit.id,
-            message = event.headCommit.message
+            message = event.headCommit.message,
+            prUrl = null
         )
     } catch (e: SerializationException) {
         null
@@ -62,10 +64,12 @@ private fun populateOnJsonOpened(eventJson: String): BaseGithubContext? {
     @Suppress("SwallowedException")
     return try {
         val event = JsonUtil.instance.decodeFromString<GithubOpenedContext>(eventJson)
+        println("Matched with a Opened event")
         return BaseGithubContext(
             displayName = event.pullRequest.user.login,
             sha = event.pullRequest.head.sha,
-            message = event.pullRequest.title
+            message = event.pullRequest.title,
+            prUrl = null
         )
     } catch (e: SerializationException) {
         null
@@ -76,10 +80,12 @@ private fun populateOnJsonCreated(eventJson: String): BaseGithubContext? {
     @Suppress("SwallowedException")
     return try {
         val event = JsonUtil.instance.decodeFromString<GithubCreatedContext>(eventJson)
+        println("Matched with a Created event")
         return BaseGithubContext(
-            displayName = event.pullRequest.user.login,
-            sha = event.sha,
-            message = event.pullRequest.title
+            displayName = event.sender.login,
+            sha = null,
+            message = event.issue.title,
+            prUrl = event.issue.url
         )
     } catch (e: SerializationException) {
         null
@@ -87,9 +93,11 @@ private fun populateOnJsonCreated(eventJson: String): BaseGithubContext? {
 }
 
 private fun handleFailure(): BaseGithubContext {
+    println("DIDNT MATCH an event :((((")
     return BaseGithubContext(
         displayName = null,
         sha = null,
-        message = null
+        message = null,
+        prUrl = null
     )
 }
