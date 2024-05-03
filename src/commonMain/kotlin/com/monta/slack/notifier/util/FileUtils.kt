@@ -45,6 +45,7 @@ fun populateEventFromJson(eventJson: String): BaseGithubContext {
 }
 
 private fun populateOnJsonPush(eventJson: String): BaseGithubContext? {
+    @Suppress("SwallowedException")
     return try {
         val event = JsonUtil.instance.decodeFromString<GithubPushContext.Event>(eventJson)
         return BaseGithubContext(
@@ -58,6 +59,7 @@ private fun populateOnJsonPush(eventJson: String): BaseGithubContext? {
 }
 
 private fun populateOnJsonOpened(eventJson: String): BaseGithubContext? {
+    @Suppress("SwallowedException")
     return try {
         val event = JsonUtil.instance.decodeFromString<GithubOpenedContext>(eventJson)
         return BaseGithubContext(
@@ -71,6 +73,7 @@ private fun populateOnJsonOpened(eventJson: String): BaseGithubContext? {
 }
 
 private fun populateOnJsonCreated(eventJson: String): BaseGithubContext? {
+    @Suppress("SwallowedException")
     return try {
         val event = JsonUtil.instance.decodeFromString<GithubCreatedContext>(eventJson)
         return BaseGithubContext(
