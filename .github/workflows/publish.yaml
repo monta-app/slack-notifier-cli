@@ -32,22 +32,20 @@ jobs:
           sudo apt install libcurl4-openssl-dev
       - name: Build with Gradle
         run: ./gradlew commonBinaries
-      - name: Rename executable based on runner
+      - name: Move and apply correct permissions to binary
         run: |
-          if [ "${{ matrix.machine }}" == "self-hosted-arm64" ]; then
-            cp build/bin/common/releaseExecutable/slack-notifier-cli.kexe ./slack-notifier-cli-arm
-            chmod +x ./slack-notifier-cli-arm
-          else
-            cp build/bin/common/releaseExecutable/slack-notifier-cli.kexe ./slack-notifier-cli
-            chmod +x ./slack-notifier-cli
-          fi
+          cp build/bin/common/releaseExecutable/slack-notifier-cli.kexe ./slack-notifier-cli-${{ runner.arch }}
+          chmod +x ./slack-notifier-cli-${{ runner.arch }}
       - name: Upload executable
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.machine == 'self-hosted-arm64' && 'slack-notifier-cli-arm' || 'slack-notifier-cli' }}
-          path: ${{ matrix.machine == 'self-hosted-arm64' && 'slack-notifier-cli-arm' || 'slack-notifier-cli' }}
+          name: slack-notifier-cli-${{ runner.arch }}
+          path: slack-notifier-cli-${{ runner.arch }}
   change-log:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        machine: [ubuntu-latest, self-hosted-arm64]
+    runs-on: ${{ matrix.machine }}
     needs: build
     timeout-minutes: 5
     steps:
@@ -69,24 +67,12 @@ jobs:
       - name: Download a single artifact
         uses: actions/download-artifact@v4
         with:
-          name: slack-notifier-cli
-      - name: Download a single artifact for arm
-        uses: actions/download-artifact@v4
-        with:
-          name: slack-notifier-cli-arm
+          name: slack-notifier-cli-${{ runner.arch }}
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: slack-notifier-cli
-          asset_name: slack-notifier-cli
-          tag: ${{ github.ref }}
-          overwrite: true
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: slack-notifier-cli-arm
-          asset_name: slack-notifier-cli-arm
+          file: slack-notifier-cli-${{ runner.arch }}
+          asset_name: slack-notifier-cli-${{ runner.arch }}
           tag: ${{ github.ref }}
           overwrite: true
