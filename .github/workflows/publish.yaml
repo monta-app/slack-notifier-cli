@@ -12,7 +12,7 @@ jobs:
   build:
     strategy:
       matrix:
-        machine: [ubuntu-latest, self-hosted-arm64-2xl]
+        machine: [ubuntu-latest, self-hosted-arm64]
     runs-on: ${{ matrix.machine }}
     steps:
       - uses: actions/checkout@v4
@@ -28,8 +28,8 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/build.gradle.kts') }}
       - name: Install dependencies
         run: |
-          sudo apt update
-          sudo apt install libcurl4-openssl-dev
+          sudo apt -y update
+          sudo apt -y install libcurl4-openssl-dev
       - name: Build with Gradle
         run: ./gradlew commonBinaries
       - name: Move and apply correct permissions to binary
@@ -44,7 +44,7 @@ jobs:
   change-log:
     strategy:
       matrix:
-        machine: [ubuntu-latest, self-hosted-arm64-2xl]
+        machine: [ubuntu-latest, self-hosted-arm64]
     runs-on: ${{ matrix.machine }}
     needs: build
     timeout-minutes: 5
