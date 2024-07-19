@@ -10,10 +10,7 @@ permissions:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        machine: [ubuntu-latest, self-hosted-arm64]
-    runs-on: ${{ matrix.machine }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK
@@ -28,24 +25,21 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/build.gradle.kts') }}
       - name: Install dependencies
         run: |
-          sudo apt -y update
-          sudo apt -y install libcurl4-openssl-dev
+          sudo apt update
+          sudo apt install libcurl4-openssl-dev
       - name: Build with Gradle
         run: ./gradlew commonBinaries
       - name: Move and apply correct permissions to binary
         run: |
-          cp build/bin/common/releaseExecutable/slack-notifier-cli.kexe ./slack-notifier-cli-${{ runner.arch }}
-          chmod +x ./slack-notifier-cli-${{ runner.arch }}
+          cp build/bin/common/releaseExecutable/slack-notifier-cli.kexe ./slack-notifier-cli
+          chmod +x ./slack-notifier-cli
       - name: Upload executable
         uses: actions/upload-artifact@v4
         with:
-          name: slack-notifier-cli-${{ runner.arch }}
-          path: slack-notifier-cli-${{ runner.arch }}
+          name: slack-notifier-cli
+          path: slack-notifier-cli
   change-log:
-    strategy:
-      matrix:
-        machine: [ubuntu-latest, self-hosted-arm64]
-    runs-on: ${{ matrix.machine }}
+    runs-on: ubuntu-latest
     needs: build
     timeout-minutes: 5
     steps:
@@ -67,12 +61,12 @@ jobs:
       - name: Download a single artifact
         uses: actions/download-artifact@v4
         with:
-          name: slack-notifier-cli-${{ runner.arch }}
+          name: slack-notifier-cli
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: slack-notifier-cli-${{ runner.arch }}
-          asset_name: slack-notifier-cli-${{ runner.arch }}
+          file: slack-notifier-cli
+          asset_name: slack-notifier-cli
           tag: ${{ github.ref }}
           overwrite: true
