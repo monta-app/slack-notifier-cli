@@ -41,7 +41,7 @@ jobs:
         with:
           name: slack-notifier-cli-${{ runner.arch }}
           path: slack-notifier-cli-${{ runner.arch }}
-  change-log:
+  publish:
     strategy:
       matrix:
         machine: [ubuntu-latest, self-hosted-arm64]
@@ -64,11 +64,11 @@ jobs:
           output: "console"
           slack-token: ${{ secrets.SLACK_APP_TOKEN }}
           slack-channel: "#releases"
-      - name: Download a single artifact
+      - name: Download executable
         uses: actions/download-artifact@v4
         with:
           name: slack-notifier-cli-${{ runner.arch }}
-      - name: Upload binaries to release
+      - name: Publish executable as release asset
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
