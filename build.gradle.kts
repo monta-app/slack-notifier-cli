@@ -20,7 +20,6 @@ kotlin {
     val hostArch = System.getProperty("os.arch")
 
     // Cross Compilation
-
     val commonTarget = when {
         hostOs == "Mac OS X" -> macosArm64("common")
         hostOs == "Linux" && hostArch == "aarch64" -> linuxArm64("common")
