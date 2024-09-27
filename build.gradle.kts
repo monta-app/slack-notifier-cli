@@ -62,6 +62,7 @@ kotlin {
                 implementation(kotlin("test-annotations-common"))
                 implementation("io.kotest:kotest-framework-engine:$kotestVersion")
                 implementation("io.kotest:kotest-assertions-core:$kotestVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
             }
         }
     }

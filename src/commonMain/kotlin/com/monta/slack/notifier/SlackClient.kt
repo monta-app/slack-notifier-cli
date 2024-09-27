@@ -5,29 +5,22 @@ import com.monta.slack.notifier.model.JobStatus
 import com.monta.slack.notifier.model.JobType
 import com.monta.slack.notifier.model.SlackBlock
 import com.monta.slack.notifier.model.SlackMessage
-import com.monta.slack.notifier.util.JsonUtil
+import com.monta.slack.notifier.service.Input
 import com.monta.slack.notifier.util.buildTitle
-import com.monta.slack.notifier.util.client
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.utils.io.charsets.*
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 class SlackClient(
-    private val serviceName: String?,
-    private val serviceEmoji: String?,
-    private val slackToken: String,
-    private val slackChannelId: String,
+    private val input: Input,
+    private val slackHttpClient: SlackHttpClient,
 ) {
-
     suspend fun create(
         githubEvent: GithubEvent,
         jobType: JobType,
         jobStatus: JobStatus,
     ): String {
-        val response = makeSlackRequest(
+        val response = slackHttpClient.makeSlackRequest(
             url = "https://slack.com/api/chat.postMessage",
             message = generateMessageFromGithubEvent(
                 githubEvent = githubEvent,
@@ -45,9 +38,9 @@ class SlackClient(
         jobType: JobType,
         jobStatus: JobStatus,
     ): String {
-        val previousMessage = getSlackMessageById(messageId)
+        val previousMessage = slackHttpClient.getSlackMessageById(messageId)
 
-        val response = makeSlackRequest(
+        val response = slackHttpClient.makeSlackRequest(
             url = "https://slack.com/api/chat.update",
             message = generateMessageFromGithubEvent(
                 githubEvent = githubEvent,
@@ -99,7 +92,7 @@ class SlackClient(
                         ),
                         SlackBlock.Text(
                             type = "mrkdwn",
-                            text = " \n*Comitter:*\n${githubEvent.displayName}"
+                            text = " \n*Committer:*\n${githubEvent.displayName}"
                         ),
                         SlackBlock.Text(
                             type = "mrkdwn",
@@ -126,81 +119,54 @@ class SlackClient(
         messageId: String? = null,
         previousAttachments: List<SlackMessage.Attachment>? = null,
     ): SlackMessage {
-        val attachments = mutableMapOf<JobType, SlackMessage.Attachment>()
-
-        previousAttachments?.forEach { previousAttachment ->
-            if (previousAttachment.jobType == null) {
-                return@forEach
-            }
-            attachments[previousAttachment.jobType] = previousAttachment
-        }
-
-        attachments[jobType] = SlackMessage.Attachment(
-            color = jobStatus.color,
-            fields = listOf(
-                SlackMessage.Attachment.Field(
-                    title = jobType.label,
-                    short = false,
-                    value = jobStatus.message
+        val attachments = if (input.appendAttachments) {
+            previousAttachments.orEmpty() + SlackMessage.Attachment(
+                color = jobStatus.color,
+                fields = listOf(
+                    SlackMessage.Attachment.Field(
+                        title = jobType.label + " ($LocalDateTime)",
+                        short = false,
+                        value = jobStatus.message
+                    )
                 )
             )
-        )
+        } else {
+            val attachments = mutableMapOf<JobType, SlackMessage.Attachment>()
+
+            previousAttachments?.forEach { previousAttachment ->
+                if (previousAttachment.jobType == null) {
+                    return@forEach
+                }
+                attachments[previousAttachment.jobType] = previousAttachment
+            }
+
+            attachments[jobType] = SlackMessage.Attachment(
+                color = jobStatus.color,
+                fields = listOf(
+                    SlackMessage.Attachment.Field(
+                        title = jobType.label,
+                        short = false,
+                        value = jobStatus.message
+                    )
+                )
+            )
+
+            attachments.values.toList()
+        }
 
         return generateSlackMessageFromEvent(
             githubEvent = githubEvent,
-            serviceName = serviceName,
-            serviceEmoji = serviceEmoji,
-            slackChannelId = slackChannelId,
+            serviceName = input.serviceName,
+            serviceEmoji = input.serviceEmoji,
+            slackChannelId = input.slackChannelId,
             messageId = messageId,
-            attachments = attachments.values.toList()
+            attachments = attachments
         )
     }
 
-    private suspend fun getSlackMessageById(
-        messageId: String,
-    ): MessageResponse? {
-        val response = client.get {
-            header("Authorization", "Bearer $slackToken")
-            url {
-                url("https://slack.com/api/conversations.history")
-                parameters.append("channel", slackChannelId)
-                parameters.append("oldest", messageId)
-                parameters.append("inclusive", "true")
-                parameters.append("limit", "1")
-            }
-        }
-
-        val bodyString = response.bodyAsText()
-
-        return if (response.status.value in 200..299) {
-            println("successfully got message bodyString=$bodyString")
-            JsonUtil.instance.decodeFromString(bodyString)
-        } else {
-            println("failed to get message $bodyString")
-            null
-        }
-    }
-
-    private suspend fun makeSlackRequest(url: String, message: SlackMessage): Response? {
-        val response = client.post(url) {
-            header("Authorization", "Bearer $slackToken")
-            contentType(ContentType.Application.Json.withParameter("charset", Charsets.UTF_8.name))
-            setBody(message)
-        }
-
-        val bodyString = response.bodyAsText()
-
-        return if (response.status.value in 200..299) {
-            println("successfully posted message bodyString=$bodyString")
-            JsonUtil.instance.decodeFromString(bodyString)
-        } else {
-            println("failed to post message $bodyString")
-            null
-        }
-    }
 
     @Serializable
-    private data class Response(
+    data class Response(
         @SerialName("ok")
         val ok: Boolean, // true
         @SerialName("channel")
@@ -210,7 +176,7 @@ class SlackClient(
     )
 
     @Serializable
-    private data class MessageResponse(
+    data class MessageResponse(
         @SerialName("ok")
         val ok: Boolean, // true
         @SerialName("messages")

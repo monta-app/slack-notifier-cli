@@ -3,11 +3,14 @@ package com.monta.slack.notifier.command
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
+import com.monta.slack.notifier.SlackHttpClient
 import com.monta.slack.notifier.model.GithubEvent
 import com.monta.slack.notifier.model.JobStatus
 import com.monta.slack.notifier.model.JobType
 import com.monta.slack.notifier.model.serializers.BaseGithubContext
+import com.monta.slack.notifier.service.Input
 import com.monta.slack.notifier.service.PublishSlackService
+import com.monta.slack.notifier.util.client
 import com.monta.slack.notifier.util.populateEventFromJson
 import com.monta.slack.notifier.util.readStringFromFile
 import kotlinx.coroutines.runBlocking
@@ -73,14 +76,24 @@ class PublishSlackCommand : CliktCommand() {
         envvar = "SLACK_MESSAGE_ID"
     )
 
+    private val appendStatusUpdates: String? by option(
+        help = "Append status updates or change to latest status",
+        envvar = "APPEND_STATUS_UPDATES"
+    )
+
     override fun run() {
         runBlocking {
             val githubEvent = getGithubEvent()
-            PublishSlackService(
+            val input = Input(
                 serviceName = serviceName.valueOrNull(),
                 serviceEmoji = serviceEmoji.valueOrNull(),
                 slackToken = slackToken,
-                slackChannelId = slackChannelId
+                slackChannelId = slackChannelId,
+                appendAttachments = appendStatusUpdates.toBoolean()
+            )
+            PublishSlackService(
+                input = input,
+                slackHttpClient = SlackHttpClient(input)
             ).publish(
                 githubEvent = githubEvent,
                 jobType = JobType.fromString(jobType),
