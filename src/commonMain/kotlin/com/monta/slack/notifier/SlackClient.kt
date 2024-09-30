@@ -5,14 +5,16 @@ import com.monta.slack.notifier.model.JobStatus
 import com.monta.slack.notifier.model.JobType
 import com.monta.slack.notifier.model.SlackBlock
 import com.monta.slack.notifier.model.SlackMessage
-import com.monta.slack.notifier.service.Input
 import com.monta.slack.notifier.util.buildTitle
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 class SlackClient(
-    private val input: Input,
+    private val serviceName: String?,
+    private val serviceEmoji: String?,
+    private val slackChannelId: String,
+    private val appendAttachments: Boolean,
     private val slackHttpClient: SlackHttpClient,
 ) {
     suspend fun create(
@@ -119,7 +121,7 @@ class SlackClient(
         messageId: String? = null,
         previousAttachments: List<SlackMessage.Attachment>? = null,
     ): SlackMessage {
-        val attachments = if (input.appendAttachments) {
+        val attachments = if (appendAttachments) {
             previousAttachments.orEmpty() + SlackMessage.Attachment(
                 color = jobStatus.color,
                 fields = listOf(
@@ -156,9 +158,9 @@ class SlackClient(
 
         return generateSlackMessageFromEvent(
             githubEvent = githubEvent,
-            serviceName = input.serviceName,
-            serviceEmoji = input.serviceEmoji,
-            slackChannelId = input.slackChannelId,
+            serviceName = serviceName,
+            serviceEmoji = serviceEmoji,
+            slackChannelId = slackChannelId,
             messageId = messageId,
             attachments = attachments
         )

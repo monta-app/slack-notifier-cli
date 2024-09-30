@@ -11,7 +11,7 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
-class TestSlackHttpClient(input: Input) : SlackHttpClient(input) {
+class TestSlackHttpClient(slackToken: String, slackChannelId: String) : SlackHttpClient(slackToken, slackChannelId) {
 
     val sentMessages = mutableListOf<SlackMessage>()
 
@@ -34,16 +34,12 @@ class TestSlackHttpClient(input: Input) : SlackHttpClient(input) {
 class PublishSlackServiceTest {
     @Test
     fun test_replacing_attachments() {
-        val input = Input(
+        val testSlackHttpClient = TestSlackHttpClient("token", "#monta")
+        val service = PublishSlackService(
             serviceName = "gineau pig",
             serviceEmoji = "🐷",
-            slackToken = "token",
-            slackChannelId = "#anni-test",
-            appendAttachments = false
-        )
-        val testSlackHttpClient = TestSlackHttpClient(input)
-        val service = PublishSlackService(
-            input = input,
+            slackChannelId = "#monta",
+            appendAttachments = false,
             testSlackHttpClient
         )
         runTest {
@@ -53,7 +49,7 @@ class PublishSlackServiceTest {
                     "repository",
                     "master",
                     "1",
-                    "nickelsen",
+                    "monta",
                     "a1b2c3d4",
                     "message",
                     "workflow",
@@ -73,7 +69,7 @@ class PublishSlackServiceTest {
                     "repository",
                     "master",
                     "1",
-                    "nickelsen",
+                    "monta",
                     "a1b2c3d4",
                     "message",
                     "workflow",
@@ -95,16 +91,12 @@ class PublishSlackServiceTest {
 
     @Test
     fun test_appending_attachments() {
-        val input = Input(
+        val testSlackHttpClient = TestSlackHttpClient("token", "#monta")
+        val service = PublishSlackService(
             serviceName = "gineau pig",
             serviceEmoji = "🐷",
-            slackToken = "token",
-            slackChannelId = "#anni-test",
-            appendAttachments = true
-        )
-        val testSlackHttpClient = TestSlackHttpClient(input)
-        val service = PublishSlackService(
-            input = input,
+            slackChannelId = "#monta",
+            appendAttachments = true,
             testSlackHttpClient
         )
         runTest {
@@ -114,7 +106,7 @@ class PublishSlackServiceTest {
                     "repository",
                     "master",
                     "1",
-                    "nickelsen",
+                    "monta",
                     "a1b2c3d4",
                     "message",
                     "workflow",
@@ -134,7 +126,7 @@ class PublishSlackServiceTest {
                     "repository",
                     "master",
                     "1",
-                    "nickelsen",
+                    "monta",
                     "a1b2c3d4",
                     "message",
                     "workflow",

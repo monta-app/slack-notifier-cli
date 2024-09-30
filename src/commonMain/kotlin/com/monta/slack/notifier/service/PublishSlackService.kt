@@ -7,20 +7,18 @@ import com.monta.slack.notifier.model.JobStatus
 import com.monta.slack.notifier.model.JobType
 import com.monta.slack.notifier.util.writeToOutput
 
-data class Input(
-    val serviceName: String?,
-    val serviceEmoji: String?,
-    val slackToken: String,
-    val slackChannelId: String,
-    val appendAttachments: Boolean = false,
-)
-
 class PublishSlackService(
-    input: Input,
-    slackHttpClient: SlackHttpClient,
+    private val serviceName: String?,
+    private val serviceEmoji: String?,
+    private val slackChannelId: String,
+    private val appendAttachments: Boolean = false,
+    private val slackHttpClient: SlackHttpClient,
 ) {
     private val slackClient = SlackClient(
-        input = input,
+        serviceName = serviceName,
+        serviceEmoji = serviceEmoji,
+        slackChannelId = slackChannelId,
+        appendAttachments = appendAttachments,
         slackHttpClient = slackHttpClient
     )
 

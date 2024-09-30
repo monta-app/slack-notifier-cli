@@ -8,9 +8,7 @@ import com.monta.slack.notifier.model.GithubEvent
 import com.monta.slack.notifier.model.JobStatus
 import com.monta.slack.notifier.model.JobType
 import com.monta.slack.notifier.model.serializers.BaseGithubContext
-import com.monta.slack.notifier.service.Input
 import com.monta.slack.notifier.service.PublishSlackService
-import com.monta.slack.notifier.util.client
 import com.monta.slack.notifier.util.populateEventFromJson
 import com.monta.slack.notifier.util.readStringFromFile
 import kotlinx.coroutines.runBlocking
@@ -84,16 +82,12 @@ class PublishSlackCommand : CliktCommand() {
     override fun run() {
         runBlocking {
             val githubEvent = getGithubEvent()
-            val input = Input(
+            PublishSlackService(
                 serviceName = serviceName.valueOrNull(),
                 serviceEmoji = serviceEmoji.valueOrNull(),
-                slackToken = slackToken,
                 slackChannelId = slackChannelId,
-                appendAttachments = appendStatusUpdates.toBoolean()
-            )
-            PublishSlackService(
-                input = input,
-                slackHttpClient = SlackHttpClient(input)
+                appendAttachments = appendStatusUpdates.toBoolean(),
+                slackHttpClient = SlackHttpClient(slackToken, slackChannelId)
             ).publish(
                 githubEvent = githubEvent,
                 jobType = JobType.fromString(jobType),

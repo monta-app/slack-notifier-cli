@@ -3,10 +3,8 @@ package com.monta.slack.notifier
 import com.monta.slack.notifier.SlackClient.MessageResponse
 import com.monta.slack.notifier.SlackClient.Response
 import com.monta.slack.notifier.model.SlackMessage
-import com.monta.slack.notifier.service.Input
 import com.monta.slack.notifier.util.JsonUtil
 import com.monta.slack.notifier.util.client
-import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -17,17 +15,18 @@ import io.ktor.http.*
 import io.ktor.utils.io.charsets.*
 
 open class SlackHttpClient(
-    private val input: Input,
+    private val slackToken: String,
+    private val slackChannelId: String,
 ) {
 
     open suspend fun getSlackMessageById(
         messageId: String,
     ): MessageResponse? {
         val response = client.get {
-            header("Authorization", "Bearer ${input.slackToken}")
+            header("Authorization", "Bearer ${slackToken}")
             url {
                 url("https://slack.com/api/conversations.history")
-                parameters.append("channel", input.slackChannelId)
+                parameters.append("channel", slackChannelId)
                 parameters.append("oldest", messageId)
                 parameters.append("inclusive", "true")
                 parameters.append("limit", "1")
@@ -47,7 +46,7 @@ open class SlackHttpClient(
 
     open suspend fun makeSlackRequest(url: String, message: SlackMessage): Response? {
         val response = client.post(url) {
-            header("Authorization", "Bearer ${input.slackToken}")
+            header("Authorization", "Bearer ${slackToken}")
             contentType(ContentType.Application.Json.withParameter("charset", Charsets.UTF_8.name))
             setBody(message)
         }
