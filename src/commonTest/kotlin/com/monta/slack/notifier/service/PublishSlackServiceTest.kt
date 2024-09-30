@@ -84,9 +84,7 @@ class PublishSlackServiceTest {
             val slackMessagesAfter = testSlackHttpClient.listMessages()
             slackMessagesAfter.size shouldBe 2
             slackMessagesAfter.last().attachments?.size shouldBe 1
-
         }
-
     }
 
     @Test
