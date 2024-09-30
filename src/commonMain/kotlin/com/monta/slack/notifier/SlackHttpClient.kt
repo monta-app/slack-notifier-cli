@@ -11,8 +11,10 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
 import io.ktor.client.statement.bodyAsText
-import io.ktor.http.*
-import io.ktor.utils.io.charsets.*
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.utils.io.charsets.Charsets
+import io.ktor.utils.io.charsets.name
 
 open class SlackHttpClient(
     private val slackToken: String,
@@ -23,7 +25,7 @@ open class SlackHttpClient(
         messageId: String,
     ): MessageResponse? {
         val response = client.get {
-            header("Authorization", "Bearer ${slackToken}")
+            header("Authorization", "Bearer $slackToken")
             url {
                 url("https://slack.com/api/conversations.history")
                 parameters.append("channel", slackChannelId)
@@ -46,7 +48,7 @@ open class SlackHttpClient(
 
     open suspend fun makeSlackRequest(url: String, message: SlackMessage): Response? {
         val response = client.post(url) {
-            header("Authorization", "Bearer ${slackToken}")
+            header("Authorization", "Bearer $slackToken")
             contentType(ContentType.Application.Json.withParameter("charset", Charsets.UTF_8.name))
             setBody(message)
         }
@@ -61,6 +63,4 @@ open class SlackHttpClient(
             null
         }
     }
-
-
 }

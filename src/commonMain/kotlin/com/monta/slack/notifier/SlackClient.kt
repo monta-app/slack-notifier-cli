@@ -166,7 +166,6 @@ class SlackClient(
         )
     }
 
-
     @Serializable
     data class Response(
         @SerialName("ok")
