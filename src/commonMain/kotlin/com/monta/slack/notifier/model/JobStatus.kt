@@ -20,6 +20,10 @@ enum class JobStatus(
         message = "Cancelled :warning:",
         color = "#FFFF00"
     ),
+    Skipped(
+        message = "Skipped :wave:",
+        color = "#C4C4C4"
+    ),
     Unknown(
         message = "Something went wrong :question:",
         color = "#DBAB09"
