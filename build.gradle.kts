@@ -1,6 +1,6 @@
 plugins {
     kotlin("multiplatform") version "1.9.22"
-    kotlin("plugin.serialization") version "1.9.22"
+    kotlin("plugin.serialization") version "2.1.21"
     id("io.kotest.multiplatform") version "5.8.0"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
 }
