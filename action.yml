@@ -1,0 +1,58 @@
+name: 'Slack Notifier CLI'
+description: 'Send Slack notifications from GitHub workflows with rich formatting'
+author: 'Monta'
+
+inputs:
+  github-event-path:
+    description: 'GitHub Context event json file path'
+    required: false
+    default: ${{ github.event_path }}
+  github-repository:
+    description: 'GitHub Context repository'
+    required: false
+    default: ${{ github.repository }}
+  github-run-id:
+    description: 'GitHub Context run id'
+    required: false
+    default: ${{ github.run_id }}
+  github-workflow:
+    description: 'GitHub Context workflow'
+    required: false
+    default: ${{ github.workflow }}
+  github-ref-name:
+    description: 'GitHub Context ref name'
+    required: false
+    default: ${{ github.ref_name }}
+  service-name:
+    description: 'Name of the service for display in Slack'
+    required: false
+  service-emoji:
+    description: 'Emoji for the service'
+    required: false
+  job-type:
+    description: 'Job Type (e.g., build, test, deploy)'
+    required: true
+  job-status:
+    description: 'Job Status (e.g., success, failure, in_progress)'
+    required: true
+  slack-token:
+    description: 'Slack Bot Token (xoxb-...)'
+    required: true
+  slack-channel-id:
+    description: 'Slack channel ID where messages will be posted'
+    required: true
+  slack-message-id:
+    description: 'Slack message ID to update (for updating existing messages)'
+    required: false
+
+outputs:
+  slack-message-id:
+    description: 'The ID of the Slack message that was created or updated'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
+
+branding:
+  icon: 'message-circle'
+  color: 'blue'
