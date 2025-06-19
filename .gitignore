@@ -1,21 +1,30 @@
-.gradle
-/build/
-/plugin/build
+# Go binaries
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
 
-# Ignore Gradle GUI config
-gradle-app.setting
+# Go test files
+*.test
 
-# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
-!gradle-wrapper.jar
+# Go coverage files
+*.out
+coverage.html
 
-# Cache of project
-.gradletasknamecache
+# Build artifacts
+dist/
 
-# Intellij Files
-.idea
+# IDE files
+.vscode/
+.idea/
 
-# MacOs?
+# OS files
 .DS_Store
+Thumbs.db
 
-# # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
-# gradle/wrapper/gradle-wrapper.properties
+# Temporary files
+*.tmp
+*.swp
+*~
