@@ -4,63 +4,63 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Kotlin Multiplatform CLI application for sending Slack notifications, primarily used in GitHub workflows. The project compiles to native executables for different platforms (macOS ARM64, Linux x64/ARM64, Windows x64) using Kotlin/Native.
+This is a Go CLI application for sending Slack notifications, primarily used in GitHub workflows. The project compiles to native executables for different platforms (macOS ARM64, Linux x64/ARM64, Windows x64) using Go's built-in cross-compilation.
 
 ## Key Commands
 
 ### Building and Development
-- `./gradlew build` - Full build including compilation and tests
-- `./gradlew commonBinaries` - Build native executables (default task)
-- `./gradlew linkReleaseExecutableCommon` - Build release executable
-- `./gradlew linkDebugExecutableCommon` - Build debug executable
+- `make build` - Build for current platform
+- `make build-all` - Cross-compile for all supported platforms
+- `go build -o bin/slack-notifier-cli .` - Direct Go build
 
 ### Running
-- `./gradlew runDebugExecutableCommon` - Run debug executable
-- `./gradlew runReleaseExecutableCommon` - Run release executable
+- `./bin/slack-notifier-cli` - Run the built executable
+- `go run . publish --help` - Run directly with Go
 
 ### Testing
-- `./gradlew commonTest` - Run tests for common target
-- `./gradlew allTests` - Run all tests with aggregated report
+- `make test` - Run all tests
+- `make test-coverage` - Run tests with coverage report
+- `go test ./...` - Direct Go test execution
 
 ### Code Quality
-- `./gradlew ktlintCheck` - Run linting
-- `./gradlew ktlintFormat` - Auto-format code
-- `./gradlew check` - Run all checks (tests + linting)
+- `make fmt` - Format Go code
+- `make lint` - Run linting (requires golangci-lint)
+- `make dev` - Development cycle (format, build, test)
 
 ## Architecture
 
 ### Main Components
-- **Main.kt**: Entry point that delegates to PublishSlackCommand
-- **PublishSlackCommand**: CLI command parser using Clikt library, handles GitHub Action environment variables
-- **PublishSlackService**: Orchestrates the Slack publishing workflow
-- **SlackClient**: Handles Slack API interactions (create/update messages)
+- **main.go**: Entry point that sets up the CLI application
+- **cmd/publish.go**: CLI command using urfave/cli library, handles GitHub Action environment variables
+- **pkg/service/publish_slack.go**: Orchestrates the Slack publishing workflow
+- **pkg/client/slack.go**: Handles Slack API interactions (create/update messages)
 
 ### Key Models
-- **GithubEvent**: Unified GitHub event data from various GitHub webhook payloads
-- **JobType/JobStatus**: Enums for workflow job classification
-- **SlackMessage/SlackBlock**: Slack message structure for rich formatting
+- **pkg/models/github.go**: Unified GitHub event data from various GitHub webhook payloads
+- **pkg/models/job.go**: Job types and status enums for workflow classification
+- **pkg/models/slack.go**: Slack message structure for rich formatting
 
 ### Data Flow
 1. GitHub Action provides environment variables and event JSON file
-2. PublishSlackCommand parses CLI options and GitHub event data
-3. Event JSON is normalized into GithubEvent via serializers in `model/serializers/`
+2. CLI command parses options and GitHub event data using urfave/cli
+3. Event JSON is normalized into GitHubEvent via parsers in `pkg/utils/`
 4. PublishSlackService coordinates message creation/update via SlackClient
 5. Output includes SLACK_MESSAGE_ID for subsequent workflow steps
 
 ### Dependencies
-- **Clikt**: CLI argument parsing
-- **Ktor**: HTTP client for Slack API calls
-- **kotlinx-serialization**: JSON parsing for GitHub events
-- **kotlinx-datetime**: Date/time handling
-- **Kotest**: Testing framework
+- **urfave/cli**: CLI argument parsing and command structure
+- **resty**: HTTP client for Slack API calls
+- **encoding/json**: Standard JSON parsing for GitHub events
+- **time**: Standard date/time handling
+- **testify**: Testing framework with assertions
 
 ## Development Notes
 
 ### Platform Targeting
-The project uses cross-compilation with a single "common" target that maps to the host platform. The native target selection happens at build time based on OS detection.
+The project uses Go's built-in cross-compilation to generate native executables for multiple platforms. Build targets are configured in the Makefile and support macOS ARM64/x64, Linux x64/ARM64, and Windows x64.
 
 ### GitHub Integration
-The CLI is designed to run in GitHub Actions and expects specific environment variables (GITHUB_EVENT_PATH, GITHUB_REPOSITORY, etc.). Event parsing handles multiple GitHub webhook formats through dedicated serializers.
+The CLI is designed to run in GitHub Actions and expects specific environment variables (GITHUB_EVENT_PATH, GITHUB_REPOSITORY, etc.). Event parsing handles multiple GitHub webhook formats through dedicated parsers in pkg/utils/.
 
 ### Usage Context
 This tool is typically used indirectly through:
