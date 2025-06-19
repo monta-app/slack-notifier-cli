@@ -1,6 +1,7 @@
 # Slack Notifier CLI (Go)
 
-A cross-platform CLI tool for sending structured Slack notifications from GitHub Actions workflows. This is a complete rewrite of the original Kotlin Native application in Go.
+A cross-platform CLI tool for sending structured Slack notifications from GitHub Actions workflows. This is a complete
+rewrite of the original Kotlin Native application in Go.
 
 ## Features
 
@@ -36,20 +37,20 @@ All GitHub-specific environment variables are automatically detected when runnin
 
 ## Command Line Options
 
-| Option | Environment Variable | Required | Description |
-|--------|---------------------|----------|-------------|
-| `--github-event-path` | `GITHUB_EVENT_PATH` | Yes | Path to GitHub event JSON file |
-| `--github-repository` | `GITHUB_REPOSITORY` | Yes | GitHub repository (e.g., owner/repo) |
-| `--github-run-id` | `GITHUB_RUN_ID` | Yes | GitHub Actions run ID |
-| `--github-workflow` | `GITHUB_WORKFLOW` | Yes | GitHub workflow name |
-| `--github-ref-name` | `GITHUB_REF_NAME` | Yes | GitHub ref name (branch/tag) |
-| `--service-name` | `PUBLISH_SLACK_SERVICE_NAME` | No | Service name (default: "GitHub Actions") |
-| `--service-emoji` | `PUBLISH_SLACK_SERVICE_EMOJI` | No | Service emoji (default: "⚡") |
-| `--job-type` | `PUBLISH_SLACK_JOB_TYPE` | Yes | Job type (Test, Build, Deploy, PublishDocs) |
-| `--job-status` | `PUBLISH_SLACK_JOB_STATUS` | Yes | Job status (Progress, Success, Failure, Cancelled, Unknown) |
-| `--slack-token` | `SLACK_APP_TOKEN` | Yes | Slack app token |
-| `--slack-channel-id` | `SLACK_CHANNEL_ID` | Yes | Slack channel ID |
-| `--slack-message-id` | `SLACK_MESSAGE_ID` | No | Slack message ID for updates |
+| Option                | Environment Variable          | Required | Description                                                 |
+|-----------------------|-------------------------------|----------|-------------------------------------------------------------|
+| `--github-event-path` | `GITHUB_EVENT_PATH`           | Yes      | Path to GitHub event JSON file                              |
+| `--github-repository` | `GITHUB_REPOSITORY`           | Yes      | GitHub repository (e.g., owner/repo)                        |
+| `--github-run-id`     | `GITHUB_RUN_ID`               | Yes      | GitHub Actions run ID                                       |
+| `--github-workflow`   | `GITHUB_WORKFLOW`             | Yes      | GitHub workflow name                                        |
+| `--github-ref-name`   | `GITHUB_REF_NAME`             | Yes      | GitHub ref name (branch/tag)                                |
+| `--service-name`      | `PUBLISH_SLACK_SERVICE_NAME`  | No       | Service name (default: "GitHub Actions")                    |
+| `--service-emoji`     | `PUBLISH_SLACK_SERVICE_EMOJI` | No       | Service emoji (default: "⚡")                                |
+| `--job-type`          | `PUBLISH_SLACK_JOB_TYPE`      | Yes      | Job type (Test, Build, Deploy, PublishDocs)                 |
+| `--job-status`        | `PUBLISH_SLACK_JOB_STATUS`    | Yes      | Job status (Progress, Success, Failure, Cancelled, Unknown) |
+| `--slack-token`       | `SLACK_APP_TOKEN`             | Yes      | Slack app token                                             |
+| `--slack-channel-id`  | `SLACK_CHANNEL_ID`            | Yes      | Slack channel ID                                            |
+| `--slack-message-id`  | `SLACK_MESSAGE_ID`            | No       | Slack message ID for updates                                |
 
 ## Development
 
@@ -101,7 +102,3 @@ This Go version maintains 100% feature compatibility with the original Kotlin Na
 - **Improved maintainability**: Cleaner architecture and testing
 
 The CLI interface remains identical, ensuring drop-in compatibility with existing GitHub Actions workflows.
-
-## License
-
-MIT License - see the original repository for details.
