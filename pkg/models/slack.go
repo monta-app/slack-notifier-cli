@@ -31,8 +31,8 @@ type SlackField struct {
 
 // SlackAttachment represents a message attachment (for colored status)
 type SlackAttachment struct {
-	Color string       `json:"color"`
-	Text  string       `json:"text"`
+	Color  string       `json:"color"`
+	Text   string       `json:"text"`
 	Blocks []SlackBlock `json:"blocks,omitempty"`
 }
 
