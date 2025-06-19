@@ -1,12 +1,12 @@
 plugins {
     kotlin("multiplatform") version "2.1.21"
-    kotlin("plugin.serialization") version "1.9.25"
+    kotlin("plugin.serialization") version "2.1.21"
     id("io.kotest.multiplatform") version "5.9.1"
     id("org.jlleitschuh.gradle.ktlint") version "12.3.0"
 }
 
 group = "com.monta.slack.notifier"
-version = "1.1.3"
+version = "1.2.0"
 
 repositories {
     mavenCentral()
