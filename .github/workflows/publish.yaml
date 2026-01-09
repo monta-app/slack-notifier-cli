@@ -63,7 +63,8 @@ jobs:
           version-mode: "SemVer"
           output: "console"
           slack-token: ${{ secrets.SLACK_APP_TOKEN }}
-          slack-channel: "#releases"
+          # Slack channel: C02PDBL6GAU = #info-releases
+          slack-channel: "C02PDBL6GAU"
       - name: Download executable
         uses: actions/download-artifact@v4
         with:
