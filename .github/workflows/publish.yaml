@@ -26,7 +26,7 @@ permissions:
 
 jobs:
   create-tag-and-build:
-    runs-on: linux-x86
+    runs-on: linux-x64
     outputs:
       new_version: ${{ steps.create_tag.outputs.new_version }}
     steps:
@@ -100,7 +100,7 @@ jobs:
           path: slack-notifier-cli-ARM64
 
   create-release:
-    runs-on: linux-x86
+    runs-on: linux-x64
     needs: create-tag-and-build
     timeout-minutes: 5
     steps:
@@ -148,7 +148,7 @@ jobs:
           overwrite: true
 
   update-action-repo:
-    runs-on: linux-x86
+    runs-on: linux-x64
     needs: [create-release, create-tag-and-build]
     steps:
       - name: Checkout slack-notifier-cli-action
