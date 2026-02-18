@@ -1,25 +1,72 @@
-name: Build binary
+name: Release new version
 
 on:
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
+
+# Prevent concurrent release workflows
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 permissions:
   contents: write
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        include:
-          - runner: linux-x86
-            arch: X64
-          - runner: linux-arm64
-            arch: ARM64
-    runs-on: ${{ matrix.runner }}
+  create-tag-and-build:
+    runs-on: linux-x64
+    outputs:
+      new_version: ${{ steps.create_tag.outputs.new_version }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create new version tag
+        id: create_tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          LATEST_TAG=$(git tag --sort=-version:refname | head -n 1)
+          echo "Latest tag: $LATEST_TAG"
+
+          VERSION=${LATEST_TAG#v}
+          MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          MINOR=$(echo "$VERSION" | cut -d. -f2)
+          PATCH=$(echo "$VERSION" | cut -d. -f3)
+
+          BUMP_TYPE="${{ inputs.version_bump || 'patch' }}"
+          echo "Version bump type: $BUMP_TYPE"
+
+          case "$BUMP_TYPE" in
+            major)
+              NEW_VERSION="v$((MAJOR + 1)).0.0"
+              ;;
+            minor)
+              NEW_VERSION="v${MAJOR}.$((MINOR + 1)).0"
+              ;;
+            patch)
+              NEW_VERSION="v${MAJOR}.${MINOR}.$((PATCH + 1))"
+              ;;
+          esac
+
+          echo "Creating new tag: $NEW_VERSION"
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+
+          git tag "$NEW_VERSION" -m "Release $NEW_VERSION" -a
+          git push origin "$NEW_VERSION"
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -29,25 +76,32 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: "/home/runner/.konan"
-          key: ${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/build.gradle.kts') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/build.gradle.kts') }}
       - name: Install dependencies
         run: |
           sudo apt -y update
           sudo apt -y install libcurl4-openssl-dev
-      - name: Build with Gradle
-        run: ./gradlew commonBinaries
-      - name: Move and apply correct permissions to binary
+      - name: Build x64 and ARM64 binaries
+        run: ./gradlew buildAllLinuxBinaries
+      - name: Prepare release binaries
         run: |
-          cp build/bin/common/releaseExecutable/slack-notifier-cli.kexe ./slack-notifier-cli-${{ matrix.arch }}
-          chmod +x ./slack-notifier-cli-${{ matrix.arch }}
-      - name: Upload executable
+          cp build/bin/common/releaseExecutable/slack-notifier-cli.kexe ./slack-notifier-cli-X64
+          cp build/bin/linuxArm64/releaseExecutable/slack-notifier-cli.kexe ./slack-notifier-cli-ARM64
+          chmod +x ./slack-notifier-cli-X64 ./slack-notifier-cli-ARM64
+      - name: Upload x64 executable
         uses: actions/upload-artifact@v4
         with:
-          name: slack-notifier-cli-${{ matrix.arch }}
-          path: slack-notifier-cli-${{ matrix.arch }}
-  publish:
-    runs-on: linux-x86
-    needs: build
+          name: slack-notifier-cli-X64
+          path: slack-notifier-cli-X64
+      - name: Upload ARM64 executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: slack-notifier-cli-ARM64
+          path: slack-notifier-cli-ARM64
+
+  create-release:
+    runs-on: linux-x64
+    needs: create-tag-and-build
     timeout-minutes: 5
     steps:
       - name: Checkout
@@ -74,15 +128,15 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: slack-notifier-cli-X64/slack-notifier-cli-X64
           asset_name: slack-notifier-cli-X64
-          tag: ${{ github.ref }}
+          tag: ${{ needs.create-tag-and-build.outputs.new_version }}
           overwrite: true
-      - name: Publish arm64 executable
+      - name: Publish ARM64 executable
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: slack-notifier-cli-ARM64/slack-notifier-cli-ARM64
           asset_name: slack-notifier-cli-ARM64
-          tag: ${{ github.ref }}
+          tag: ${{ needs.create-tag-and-build.outputs.new_version }}
           overwrite: true
       - name: Publish backwards-compatible executable
         uses: svenstaro/upload-release-action@v2
@@ -90,5 +144,65 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: slack-notifier-cli-X64/slack-notifier-cli-X64
           asset_name: slack-notifier-cli
-          tag: ${{ github.ref }}
+          tag: ${{ needs.create-tag-and-build.outputs.new_version }}
           overwrite: true
+
+  update-action-repo:
+    runs-on: linux-x64
+    needs: [create-release, create-tag-and-build]
+    steps:
+      - name: Checkout slack-notifier-cli-action
+        uses: actions/checkout@v4
+        with:
+          repository: monta-app/slack-notifier-cli-action
+          token: ${{ secrets.MONTA_BOT_TOKEN }}
+          fetch-depth: 0
+      - name: Update version in action.yml
+        run: |
+          VERSION="${{ needs.create-tag-and-build.outputs.new_version }}"
+          sed -i "s|releases/download/v[0-9]*\.[0-9]*\.[0-9]*/|releases/download/$VERSION/|g" action.yml
+          git diff action.yml
+      - name: Create or update PR
+        env:
+          GH_TOKEN: ${{ secrets.MONTA_BOT_TOKEN }}
+        run: |
+          VERSION="${{ needs.create-tag-and-build.outputs.new_version }}"
+          BRANCH_NAME="chore/update-cli-version"
+
+          git config user.name "Monta Bot"
+          git config user.email "bot@monta.app"
+
+          EXISTING_PR=$(gh pr list --head "$BRANCH_NAME" --state open --json number --jq '.[0].number' || echo "")
+
+          git checkout -B "$BRANCH_NAME"
+          git add action.yml
+          git commit -m "chore: update slack-notifier-cli to $VERSION"
+          git push origin "$BRANCH_NAME" --force
+
+          PR_BODY=$(cat <<EOF
+          Automatically generated PR to update slack-notifier-cli version.
+
+          ## Changes
+          - Update slack-notifier-cli to **$VERSION**
+
+          ## Release Notes
+          See the [slack-notifier-cli $VERSION release](https://github.com/monta-app/slack-notifier-cli/releases/tag/$VERSION) for details.
+
+          🤖 Automated by slack-notifier-cli release workflow
+          _Updated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')_
+          EOF
+          )
+
+          if [ -n "$EXISTING_PR" ]; then
+            echo "Found existing PR #$EXISTING_PR, updating..."
+            gh pr edit "$EXISTING_PR" \
+              --title "chore: update slack-notifier-cli to $VERSION" \
+              --body "$PR_BODY"
+          else
+            echo "Creating new PR..."
+            gh pr create \
+              --title "chore: update slack-notifier-cli to $VERSION" \
+              --body "$PR_BODY" \
+              --base main \
+              --head "$BRANCH_NAME"
+          fi

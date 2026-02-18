@@ -10,12 +10,7 @@ permissions:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        runner-name:
-          - linux-x86
-          - linux-arm64
-    runs-on: ${{ matrix.runner-name }}
+    runs-on: linux-x64
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK
@@ -32,14 +27,20 @@ jobs:
         run: |
           sudo apt -y update
           sudo apt -y install libcurl4-openssl-dev
-      - name: Build with Gradle
-        run: ./gradlew commonBinaries
-      - name: Move and apply correct permissions to binary
+      - name: Build x64 and ARM64 binaries
+        run: ./gradlew buildAllLinuxBinaries
+      - name: Prepare binaries
         run: |
-          cp build/bin/common/releaseExecutable/slack-notifier-cli.kexe ./slack-notifier-cli-${{ runner.arch }}
-          chmod +x ./slack-notifier-cli-${{ runner.arch }}
-      - name: Upload executable
+          cp build/bin/common/releaseExecutable/slack-notifier-cli.kexe ./slack-notifier-cli-X64
+          cp build/bin/linuxArm64/releaseExecutable/slack-notifier-cli.kexe ./slack-notifier-cli-ARM64
+          chmod +x ./slack-notifier-cli-X64 ./slack-notifier-cli-ARM64
+      - name: Upload x64 executable
         uses: actions/upload-artifact@v4
         with:
-          name: slack-notifier-cli-${{ runner.arch }}
-          path: slack-notifier-cli-${{ runner.arch }}
+          name: slack-notifier-cli-X64
+          path: slack-notifier-cli-X64
+      - name: Upload ARM64 executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: slack-notifier-cli-ARM64
+          path: slack-notifier-cli-ARM64
