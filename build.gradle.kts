@@ -17,13 +17,11 @@ defaultTasks("commonBinaries")
 kotlin {
 
     val hostOs = System.getProperty("os.name")
-    val hostArch = System.getProperty("os.arch")
 
-    // Cross Compilation
+    // Host target (always matches the build machine)
     val commonTarget = when {
         hostOs == "Mac OS X" -> macosArm64("common")
-        hostOs == "Linux" && hostArch == "aarch64" -> linuxArm64("common")
-        hostOs == "Linux" && hostArch == "amd64" -> linuxX64("common")
+        hostOs == "Linux" -> linuxX64("common")
         hostOs.startsWith("Windows") -> mingwX64("common")
         else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
     }
@@ -32,6 +30,17 @@ kotlin {
         binaries {
             executable {
                 entryPoint = "com.monta.slack.notifier.main"
+            }
+        }
+    }
+
+    // Cross-compile Linux ARM64 from x64 host
+    if (hostOs == "Linux") {
+        linuxArm64("linuxArm64") {
+            binaries {
+                executable {
+                    entryPoint = "com.monta.slack.notifier.main"
+                }
             }
         }
     }
@@ -64,11 +73,30 @@ kotlin {
                 implementation("io.kotest:kotest-assertions-core:$kotestVersion")
             }
         }
+
+        // Configure linuxArm64 to share the same source set
+        if (hostOs == "Linux") {
+            val linuxArm64Main by getting {
+                dependsOn(commonMain)
+            }
+        }
     }
 }
 
 kotlin.targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget> {
     binaries.all {
         freeCompilerArgs = freeCompilerArgs + "-Xdisable-phases=EscapeAnalysis"
+    }
+}
+
+val hostOs = System.getProperty("os.name")
+val isLinux = hostOs == "Linux"
+
+// Task to build both x64 and ARM64 binaries on Linux
+if (isLinux) {
+    tasks.register("buildAllLinuxBinaries") {
+        group = "build"
+        description = "Build binaries for both Linux x64 and ARM64"
+        dependsOn("linkReleaseExecutableCommon", "linkReleaseExecutableLinuxArm64")
     }
 }
