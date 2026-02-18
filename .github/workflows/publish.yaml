@@ -30,7 +30,7 @@ jobs:
     outputs:
       new_version: ${{ steps.create_tag.outputs.new_version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Create new version tag
@@ -105,7 +105,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Run changelog cli action
@@ -152,7 +152,7 @@ jobs:
     needs: [create-release, create-tag-and-build]
     steps:
       - name: Checkout slack-notifier-cli-action
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: monta-app/slack-notifier-cli-action
           token: ${{ secrets.MONTA_BOT_TOKEN }}
