@@ -113,10 +113,12 @@ jobs:
         with:
           service-name: "Slack Notifier Cli"
           github-release: true
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.MONTA_BOT_TOKEN }}
           jira-app-name: "montaapp"
+          jira-email: ${{ secrets.JIRA_EMAIL }}
+          jira-token: ${{ secrets.JIRA_TOKEN }}
           version-mode: "SemVer"
-          output: "console"
+          output: "slack"
           slack-token: ${{ secrets.SLACK_APP_TOKEN }}
           # Slack channel: C02PDBL6GAU = #info-releases
           slack-channel: "C02PDBL6GAU"
