@@ -100,7 +100,7 @@ jobs:
           path: slack-notifier-cli-ARM64
 
   create-release:
-    runs-on: linux-x64
+    runs-on: linux-arm64
     needs: create-tag-and-build
     timeout-minutes: 5
     steps:
@@ -150,7 +150,7 @@ jobs:
           overwrite: true
 
   update-action-repo:
-    runs-on: linux-x64
+    runs-on: linux-arm64
     needs: [create-release, create-tag-and-build]
     steps:
       - name: Checkout slack-notifier-cli-action
