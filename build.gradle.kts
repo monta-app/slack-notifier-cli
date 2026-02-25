@@ -1,8 +1,8 @@
 plugins {
     kotlin("multiplatform") version "2.1.21"
     kotlin("plugin.serialization") version "2.1.21"
-    id("io.kotest.multiplatform") version "5.9.1"
-    id("org.jlleitschuh.gradle.ktlint") version "12.3.0"
+    id("io.kotest.multiplatform") version "6.0.0-LOCAL"
+    id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
 }
 
 group = "com.monta.slack.notifier"
@@ -66,7 +66,7 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
-                val kotestVersion = "5.9.1"
+                val kotestVersion = "6.1.4"
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
                 implementation("io.kotest:kotest-framework-engine:$kotestVersion")
