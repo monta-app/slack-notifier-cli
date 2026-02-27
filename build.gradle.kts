@@ -1,6 +1,6 @@
 plugins {
-    kotlin("multiplatform") version "2.1.21"
-    kotlin("plugin.serialization") version "2.1.21"
+    kotlin("multiplatform") version "2.3.10"
+    kotlin("plugin.serialization") version "2.3.10"
     id("io.kotest.multiplatform") version "5.9.1"
     id("org.jlleitschuh.gradle.ktlint") version "12.3.0"
 }
@@ -49,15 +49,15 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 // CLI
-                implementation("com.github.ajalt.clikt:clikt:5.0.3")
+                implementation("com.github.ajalt.clikt:clikt:5.1.0")
                 // Date Time Support
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1-0.6.x-compat")
                 // Serialization
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0")
                 // Atomic
-                implementation("org.jetbrains.kotlinx:atomicfu:0.28.0")
+                implementation("org.jetbrains.kotlinx:atomicfu:0.31.0")
                 // Http Client
-                val ktorVersion = "3.2.0"
+                val ktorVersion = "3.4.0"
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
                 implementation("io.ktor:ktor-client-curl:$ktorVersion")
                 implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
