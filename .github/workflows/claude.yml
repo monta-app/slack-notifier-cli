@@ -43,8 +43,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
-            Read CLAUDE.md and .claude/lessons.md if they exist — they contain project-specific
-            rules and conventions. Apply those rules strictly during your review.
+            Read CLAUDE.md first — it contains team-specific rules. Apply those rules strictly during your review.
 
       - name: Fail on unexpected review errors
         if: steps.claude-review.outcome == 'failure' && steps.workflow-check.outputs.workflow_changed == '0'
