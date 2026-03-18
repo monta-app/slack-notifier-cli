@@ -89,12 +89,12 @@ jobs:
           cp build/bin/linuxArm64/releaseExecutable/slack-notifier-cli.kexe ./slack-notifier-cli-ARM64
           chmod +x ./slack-notifier-cli-X64 ./slack-notifier-cli-ARM64
       - name: Upload x64 executable
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: slack-notifier-cli-X64
           path: slack-notifier-cli-X64
       - name: Upload ARM64 executable
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: slack-notifier-cli-ARM64
           path: slack-notifier-cli-ARM64
@@ -123,7 +123,7 @@ jobs:
           # Slack channel: C02PDBL6GAU = #info-releases
           slack-channel: "C02PDBL6GAU"
       - name: Download all executables
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
       - name: Publish x64 executable
         uses: svenstaro/upload-release-action@v2
         with:

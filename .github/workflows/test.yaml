@@ -35,12 +35,12 @@ jobs:
           cp build/bin/linuxArm64/releaseExecutable/slack-notifier-cli.kexe ./slack-notifier-cli-ARM64
           chmod +x ./slack-notifier-cli-X64 ./slack-notifier-cli-ARM64
       - name: Upload x64 executable
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: slack-notifier-cli-X64
           path: slack-notifier-cli-X64
       - name: Upload ARM64 executable
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: slack-notifier-cli-ARM64
           path: slack-notifier-cli-ARM64
