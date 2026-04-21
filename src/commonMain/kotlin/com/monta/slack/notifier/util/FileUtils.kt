@@ -40,6 +40,7 @@ fun readStringFromFile(
  * Populates the existing event type with information needed to generate
  * an entire Slack notification.
  */
+@Suppress("detekt:ParameterListWrapping")
 fun populateEventFromJson(eventJson: String): BaseGithubContext = populateOnJsonPush(eventJson) ?: populateOnJsonOpened(eventJson) ?: populateOnJsonCreated(eventJson) ?: handleFailure()
 
 private fun populateOnJsonPush(eventJson: String): BaseGithubContext? {
