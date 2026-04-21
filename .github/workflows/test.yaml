@@ -10,13 +10,13 @@ permissions:
 
 jobs:
   build:
-    runs-on: linux-x64
+    runs-on: linux-arm64
     steps:
       - uses: actions/checkout@v6
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: '21'
+          java-version: '25'
           distribution: 'corretto'
           cache: 'gradle'
       - uses: actions/cache@v5
@@ -31,7 +31,7 @@ jobs:
         run: ./gradlew buildAllLinuxBinaries
       - name: Prepare binaries
         run: |
-          cp build/bin/common/releaseExecutable/slack-notifier-cli.kexe ./slack-notifier-cli-X64
+          cp build/bin/host/releaseExecutable/slack-notifier-cli.kexe ./slack-notifier-cli-X64
           cp build/bin/linuxArm64/releaseExecutable/slack-notifier-cli.kexe ./slack-notifier-cli-ARM64
           chmod +x ./slack-notifier-cli-X64 ./slack-notifier-cli-ARM64
       - name: Upload x64 executable
