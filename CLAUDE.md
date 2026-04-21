@@ -9,18 +9,12 @@ This is a Kotlin Multiplatform CLI application for sending Slack notifications, 
 ## Key Commands
 
 ### Building and Development
-- `./gradlew build` - Full build including compilation and tests
-- `./gradlew commonBinaries` - Build native executables (default task)
-- `./gradlew linkReleaseExecutableCommon` - Build release executable
-- `./gradlew linkDebugExecutableCommon` - Build debug executable
+- `./gradlew hostBinaries` - Build native executables for current host (default task)
+- `./gradlew buildAllLinuxBinaries` - Build release executable
 
 ### Running
-- `./gradlew runDebugExecutableCommon` - Run debug executable
-- `./gradlew runReleaseExecutableCommon` - Run release executable
-
-### Testing
-- `./gradlew commonTest` - Run tests for common target
-- `./gradlew allTests` - Run all tests with aggregated report
+- `./gradlew runDebugExecutableHost` - Run debug executable
+- `./gradlew runReleaseExecutableHost` - Run release executable
 
 ### Code Quality
 - `./gradlew ktlintCheck` - Run linting
@@ -52,12 +46,11 @@ This is a Kotlin Multiplatform CLI application for sending Slack notifications, 
 - **Ktor**: HTTP client for Slack API calls
 - **kotlinx-serialization**: JSON parsing for GitHub events
 - **kotlinx-datetime**: Date/time handling
-- **Kotest**: Testing framework
 
 ## Development Notes
 
 ### Platform Targeting
-The project uses cross-compilation with a single "common" target that maps to the host platform. The native target selection happens at build time based on OS detection.
+The project uses cross-compilation with a single "host" target that maps to the current build machine's platform. The native target selection happens at build time based on OS detection.
 
 ### GitHub Integration
 The CLI is designed to run in GitHub Actions and expects specific environment variables (GITHUB_EVENT_PATH, GITHUB_REPOSITORY, etc.). Event parsing handles multiple GitHub webhook formats through dedicated serializers.
