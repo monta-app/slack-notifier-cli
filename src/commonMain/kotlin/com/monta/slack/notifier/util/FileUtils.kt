@@ -40,9 +40,7 @@ fun readStringFromFile(
  * Populates the existing event type with information needed to generate
  * an entire Slack notification.
  */
-fun populateEventFromJson(eventJson: String): BaseGithubContext {
-    return populateOnJsonPush(eventJson) ?: populateOnJsonOpened(eventJson) ?: populateOnJsonCreated(eventJson) ?: handleFailure()
-}
+fun populateEventFromJson(eventJson: String): BaseGithubContext = populateOnJsonPush(eventJson) ?: populateOnJsonOpened(eventJson) ?: populateOnJsonCreated(eventJson) ?: handleFailure()
 
 private fun populateOnJsonPush(eventJson: String): BaseGithubContext? {
     @Suppress("SwallowedException")
@@ -89,11 +87,9 @@ private fun populateOnJsonCreated(eventJson: String): BaseGithubContext? {
     }
 }
 
-private fun handleFailure(): BaseGithubContext {
-    return BaseGithubContext(
-        displayName = null,
-        sha = null,
-        message = null,
-        prUrl = null
-    )
-}
+private fun handleFailure(): BaseGithubContext = BaseGithubContext(
+    displayName = null,
+    sha = null,
+    message = null,
+    prUrl = null
+)

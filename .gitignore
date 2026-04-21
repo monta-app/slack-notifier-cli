@@ -1,6 +1,7 @@
 .gradle
 /build/
 /plugin/build
+.kotlin/
 
 # Ignore Gradle GUI config
 gradle-app.setting
