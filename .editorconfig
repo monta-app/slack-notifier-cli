@@ -13,10 +13,15 @@ ij_kotlin_packages_to_use_import_on_demand = io.ktor.**
 ij_kotlin_name_count_to_use_star_import = 200000000
 ij_kotlin_name_count_to_use_star_import_for_members = 2000000000
 ij_kotlin_parameter_annotation_wrap = off
-ij_kotlin_allow_trailing_comma_on_call_site = false
 ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = false
+ktlint_standard_trailing-comma-on-call-site = disabled
+ktlint_standard_trailing-comma-on-declaration-site = enabled
 ktlint_code_style = intellij_idea
 ktlint_standard_discouraged-comment-location = disabled
 
 [{*.markdown,*.md}]
 ij_wrap_on_typing = true
+
+[{*.js,*.jsx,*.ts,*.tsx}]
+max_line_length = 140

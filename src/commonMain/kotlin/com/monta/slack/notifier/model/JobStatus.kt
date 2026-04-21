@@ -27,10 +27,8 @@ enum class JobStatus(
     ;
 
     companion object {
-        fun fromString(value: String?): JobStatus {
-            return values().find { state ->
-                state.name.equals(value, true)
-            } ?: Unknown
-        }
+        fun fromString(value: String?): JobStatus = entries.find { state ->
+            state.name.equals(value, true)
+        } ?: Unknown
     }
 }

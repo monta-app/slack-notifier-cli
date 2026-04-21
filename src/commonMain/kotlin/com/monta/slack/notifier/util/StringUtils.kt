@@ -29,25 +29,21 @@ fun buildTitle(
 private fun getTitle(
     serviceName: String?,
     repository: String?,
-): String? {
-    return if (serviceName.isNullOrBlank()) {
-        repository.toTitle()
-    } else {
-        serviceName
-    }
+): String? = if (serviceName.isNullOrBlank()) {
+    repository.toTitle()
+} else {
+    serviceName
 }
 
-private fun String?.toTitle(): String? {
-    return this?.split("/")
-        ?.last()
-        ?.split("-")
-        ?.joinToString(" ") { word ->
-            word.replaceFirstChar { firstChar ->
-                if (firstChar.isLowerCase()) {
-                    firstChar.titlecase()
-                } else {
-                    firstChar.toString()
-                }
+private fun String?.toTitle(): String? = this?.split("/")
+    ?.last()
+    ?.split("-")
+    ?.joinToString(" ") { word ->
+        word.replaceFirstChar { firstChar ->
+            if (firstChar.isLowerCase()) {
+                firstChar.titlecase()
+            } else {
+                firstChar.toString()
             }
         }
-}
+    }

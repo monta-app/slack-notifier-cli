@@ -10,9 +10,7 @@ class GithubEvent(
     val workflow: String?,
     val prUrl: String?,
 ) {
-    fun getRunUrl(): String {
-        return "https://github.com/$repository/actions/runs/$runId"
-    }
+    fun getRunUrl(): String = "https://github.com/$repository/actions/runs/$runId"
     fun getChangeIdentifier(): String? {
         if (commitSHA != null) {
             return commitSHA
@@ -29,14 +27,13 @@ class GithubEvent(
         }
         return "https://github.com/$repository/"
     }
-    fun getChangeMessage(): String? {
-        return message
-            ?.replace("\n", " ")
-            ?.replace("\r", " ")
-            ?.replace("<", "")
-            ?.replace(">", "")
-            ?.take(120)
-    }
+    fun getChangeMessage(): String? = message
+        ?.replace("\n", " ")
+        ?.replace("\r", " ")
+        ?.replace("<", "")
+        ?.replace(">", "")
+        ?.take(120)
+
     fun getPRidentifier(url: String): String? {
         // Will extract the "pull/51" part of
         // "https://github.com/monta-app/data-smart-charge/pull/51",
