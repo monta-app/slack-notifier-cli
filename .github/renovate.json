@@ -2,23 +2,10 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended",
+    "helpers:pinGitHubActionDigests",
     ":semanticCommitTypeAll(chore)"
   ],
-  "packageRules": [
-    {
-      "groupName": "upgrade all gradle dependencies",
-      "matchManagers": [
-        "gradle"
-      ],
-      "groupSlug": "gradle",
-      "matchUpdateTypes": [
-        "minor",
-        "patch",
-        "major"
-      ],
-      "matchPackageNames": [
-        "*"
-      ]
-    }
-  ]
+  "semanticCommits": "enabled",
+  "prConcurrentLimit": 2,
+  "rebaseWhen": "conflicted"
 }
