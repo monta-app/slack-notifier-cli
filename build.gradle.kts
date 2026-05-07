@@ -50,7 +50,7 @@ kotlin {
                 // CLI
                 implementation("com.github.ajalt.clikt:clikt:5.1.0")
                 // Date Time Support
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1-0.6.x-compat")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.8.0-0.6.x-compat")
                 // Serialization
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
                 // Atomic
