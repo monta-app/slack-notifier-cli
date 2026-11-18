@@ -123,7 +123,7 @@ jobs:
           # Slack channel: C02PDBL6GAU = #info-releases
           slack-channel: "C02PDBL6GAU"
       - name: Download all executables
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
       - name: Publish x64 executable
         uses: svenstaro/upload-release-action@29e53e917877a24fad85510ded594ab3c9ca12de # v2
         with:
