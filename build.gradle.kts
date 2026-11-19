@@ -52,7 +52,7 @@ kotlin {
                 // Date Time Support
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.8.0-0.6.x-compat")
                 // Serialization
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.13.0")
                 // Atomic
                 implementation("org.jetbrains.kotlinx:atomicfu:0.33.0")
                 // Http Client
